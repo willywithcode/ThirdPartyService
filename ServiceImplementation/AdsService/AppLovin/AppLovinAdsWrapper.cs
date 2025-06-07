@@ -7,29 +7,35 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
     using ThirdPartyService.Core.AdsService;
     using ThirdPartyService.Core.AdsService.AOA;
     using ThirdPartyService.Core.AdsService.MREC;
+    using ThirdPartyService.Core.Signals;
+    using ThirdPartyService.ServiceImplementation.AdsService.LocalData;
     using ThirdPartyService.ServiceImplementation.Configs;
-    using ThirdPartyService.ServiceImplementation.Signals;
     using VContainer.Unity;
 
-    public class AppLovinAdsWrapper : IInitializable, IAdsService, IMRECAdsService, IAOAAdService
+    public class AppLovinAdsWrapper : IInitializable, IDisposable, IAdsService, IMRECAdsService, IAOAAdService
     {
         #region Inject
 
-        private readonly AppLovinSetting appLovinSetting;
-        private readonly SignalBus       signalBus;
+        private readonly AppLovinSetting     appLovinSetting;
+        private readonly SignalBus           signalBus;
+        private readonly AdsLocalDataService adsLocalDataService;
 
         public AppLovinAdsWrapper(
-            IAssetsManager assetsManager,
-            SignalBus      signalBus
+            IAssetsManager      assetsManager,
+            SignalBus           signalBus,
+            AdsLocalDataService adsLocalDataService
         )
         {
-            this.signalBus       = signalBus;
-            this.appLovinSetting = assetsManager.LoadAsset<ThirdPartyConfig>("ThirdPartyConfig").appLovinSetting;
+            this.signalBus           = signalBus;
+            this.adsLocalDataService = adsLocalDataService;
+            this.appLovinSetting     = assetsManager.LoadAsset<ThirdPartyConfig>("ThirdPartyConfig").appLovinSetting;
         }
 
         #endregion
 
         private bool isInit;
+
+        #region Initialization
 
         public virtual async void Initialize()
         {
@@ -51,6 +57,18 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             this.isInit = true;
         }
 
+        public void Dispose()
+        {
+            MaxSdkCallbacks.OnSdkInitializedEvent -= this.OnSDKInitializedHandler;
+            this.DisposeBannerAds();
+            this.DisposeMRECAds();
+            this.DisposeInterstitialAds();
+            this.DisposeRewardedAds();
+            this.DisposeAOAAds();
+            MaxSdk.DestroyBanner(this.appLovinSetting.BannerAdUnitId);
+            this.isInit = false;
+        }
+
         private void OnSDKInitializedHandler(MaxSdkBase.SdkConfiguration obj)
         {
             #if ADS_DEBUG
@@ -58,7 +76,32 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             #endif
         }
 
+        private void InitInterstitialAds()
+        {
+            MaxSdkCallbacks.Interstitial.OnAdLoadedEvent        += this.OnInterstitialLoadedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdLoadFailedEvent    += this.OnInterstitialLoadFailedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdDisplayedEvent     += this.OnInterstitialDisplayedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdClickedEvent       += this.OnInterstitialClickedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdHiddenEvent        += this.OnInterstitialHiddenEvent;
+            MaxSdkCallbacks.Interstitial.OnAdDisplayFailedEvent += this.OnInterstitialAdFailedToDisplayEvent;
+            this.LoadInterstitial();
+        }
+
+        private void DisposeInterstitialAds()
+        {
+            MaxSdkCallbacks.Interstitial.OnAdLoadedEvent        -= this.OnInterstitialLoadedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdLoadFailedEvent    -= this.OnInterstitialLoadFailedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdDisplayedEvent     -= this.OnInterstitialDisplayedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdClickedEvent       -= this.OnInterstitialClickedEvent;
+            MaxSdkCallbacks.Interstitial.OnAdHiddenEvent        -= this.OnInterstitialHiddenEvent;
+            MaxSdkCallbacks.Interstitial.OnAdDisplayFailedEvent -= this.OnInterstitialAdFailedToDisplayEvent;
+        }
+
         private void InitAOAAds()
+        {
+        }
+
+        private void DisposeAOAAds()
         {
         }
 
@@ -75,18 +118,23 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             this.LoadRewardedAd();
         }
 
-        private void InitInterstitialAds()
+        private void DisposeRewardedAds()
         {
-            MaxSdkCallbacks.Interstitial.OnAdLoadedEvent        += this.OnInterstitialLoadedEvent;
-            MaxSdkCallbacks.Interstitial.OnAdLoadFailedEvent    += this.OnInterstitialLoadFailedEvent;
-            MaxSdkCallbacks.Interstitial.OnAdDisplayedEvent     += this.OnInterstitialDisplayedEvent;
-            MaxSdkCallbacks.Interstitial.OnAdClickedEvent       += this.OnInterstitialClickedEvent;
-            MaxSdkCallbacks.Interstitial.OnAdHiddenEvent        += this.OnInterstitialHiddenEvent;
-            MaxSdkCallbacks.Interstitial.OnAdDisplayFailedEvent += this.OnInterstitialAdFailedToDisplayEvent;
-            this.LoadInterstitial();
+            MaxSdkCallbacks.Rewarded.OnAdLoadedEvent         -= this.OnRewardedAdLoadedEvent;
+            MaxSdkCallbacks.Rewarded.OnAdLoadFailedEvent     -= this.OnRewardedAdLoadFailedEvent;
+            MaxSdkCallbacks.Rewarded.OnAdDisplayedEvent      -= this.OnRewardedAdDisplayedEvent;
+            MaxSdkCallbacks.Rewarded.OnAdClickedEvent        -= this.OnRewardedAdClickedEvent;
+            MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent    -= this.OnRewardedAdRevenuePaidEvent;
+            MaxSdkCallbacks.Rewarded.OnAdHiddenEvent         -= this.OnRewardedAdHiddenEvent;
+            MaxSdkCallbacks.Rewarded.OnAdDisplayFailedEvent  -= this.OnRewardedAdFailedToDisplayEvent;
+            MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent -= this.OnRewardedAdReceivedRewardEvent;
         }
 
         private void InitMRECAds()
+        {
+        }
+
+        private void DisposeMRECAds()
         {
         }
 
@@ -94,8 +142,6 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
         {
             var adViewConfiguration = new MaxSdk.AdViewConfiguration(MaxSdk.AdViewPosition.BottomCenter);
             MaxSdk.CreateBanner(this.appLovinSetting.BannerAdUnitId, adViewConfiguration);
-
-            // Set background color for banners to be fully functional
             MaxSdk.SetBannerBackgroundColor(this.appLovinSetting.BannerAdUnitId, this.appLovinSetting.BannerBackgroundColor);
             MaxSdkCallbacks.Banner.OnAdLoadedEvent     += this.OnBannerAdLoadedHandler;
             MaxSdkCallbacks.Banner.OnAdLoadFailedEvent += this.OnBannerAdLoadFailedHandler;
@@ -104,13 +150,28 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             MaxSdkCallbacks.Banner.OnAdCollapsedEvent  += this.OnBannerAdCollapsedHandler;
         }
 
+        private void DisposeBannerAds()
+        {
+            MaxSdkCallbacks.Banner.OnAdLoadedEvent     -= this.OnBannerAdLoadedHandler;
+            MaxSdkCallbacks.Banner.OnAdLoadFailedEvent -= this.OnBannerAdLoadFailedHandler;
+            MaxSdkCallbacks.Banner.OnAdClickedEvent    -= this.OnBannerAdClickedHandler;
+            MaxSdkCallbacks.Banner.OnAdExpandedEvent   -= this.OnBannerAdExpandedHandler;
+            MaxSdkCallbacks.Banner.OnAdCollapsedEvent  -= this.OnBannerAdCollapsedHandler;
+        }
+
+        #endregion
+
+        #region Banner
+
         public void ShowBannerAd(BannerAdsPosition bannerAdsPosition = BannerAdsPosition.Bottom, int width = 320, int height = 50)
         {
+            if (this.IsRemoveAds()) return;
             MaxSdk.ShowBanner(this.appLovinSetting.BannerAdUnitId);
         }
 
         public void HideBannedAd()
         {
+            if (this.IsRemoveAds()) return;
             MaxSdk.HideBanner(this.appLovinSetting.BannerAdUnitId);
         }
 
@@ -119,19 +180,29 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             MaxSdk.DestroyBanner(this.appLovinSetting.BannerAdUnitId);
         }
 
+        #endregion
+
+        #region Interstitial
+
         public bool IsInterstitialAdReady(string place)
         {
-            throw new NotImplementedException();
+            if (this.IsRemoveAds()) return false;
+            return MaxSdk.IsInterstitialReady(this.appLovinSetting.InterAdUnitId);
         }
 
         public void ShowInterstitialAd(string place)
         {
+            if (this.IsRemoveAds()) return;
             if (MaxSdk.IsInterstitialReady(this.appLovinSetting.InterAdUnitId)) MaxSdk.ShowInterstitial(this.appLovinSetting.InterAdUnitId);
         }
 
+        #endregion
+
+        #region Rewarded
+
         public bool IsRewardedAdReady(string place)
         {
-            throw new NotImplementedException();
+            return MaxSdk.IsRewardedAdReady(this.appLovinSetting.RewardedAdUnitId);
         }
 
         public void ShowRewardedAd(string place, Action onCompleted, Action onFailed = null)
@@ -150,9 +221,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             }
         }
 
+        #endregion
+
         public void RemoveAds(bool revokeConsent = false)
         {
-            throw new NotImplementedException();
+            this.adsLocalDataService.DisableAds();
         }
 
         public bool IsAdsInitialized()
@@ -160,10 +233,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             return this.isInit;
         }
 
-        public bool IsRemoveAds()
-        {
-            throw new NotImplementedException();
-        }
+        public bool IsRemoveAds() => !this.adsLocalDataService.IsAdsEnabled();
+
+        #region MREC
 
         public void ShowMREC(AdViewPosition adViewPosition)
         {
@@ -200,6 +272,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             throw new NotImplementedException();
         }
 
+        #endregion
+
+        #region AOA
+
         public bool IsAOAReady()
         {
             throw new NotImplementedException();
@@ -209,6 +285,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region Ads Event
 
         //.............
         // Banner
@@ -239,6 +319,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
             this.signalBus.Fire(new BannerAdLoadedSignal(arg2.Placement));
         }
 
+        //.............
+        // Interstitial
+        //.............
         private int retryAttempt;
 
         private void LoadInterstitial()
@@ -263,7 +346,6 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
 
         private void OnInterstitialAdFailedToDisplayEvent(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
         {
-            // Interstitial ad failed to display. AppLovin recommends that you load the next ad.
             this.LoadInterstitial();
         }
 
@@ -271,10 +353,12 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
 
         private void OnInterstitialHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            // Interstitial ad is hidden. Pre-load the next ad.
             this.LoadInterstitial();
         }
 
+        //.............
+        // Rewarded
+        //.............
         private void LoadRewardedAd()
         {
             MaxSdk.LoadRewardedAd(this.appLovinSetting.RewardedAdUnitId);
@@ -324,5 +408,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
         {
             // Ad revenue paid. Use this callback to track user revenue.
         }
+
+        #endregion
     }
 }

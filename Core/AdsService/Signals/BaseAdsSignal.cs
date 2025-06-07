@@ -1,4 +1,4 @@
-namespace ThirdPartyService.ServiceImplementation.Signals
+namespace ThirdPartyService.Core.Signals
 {
     public class BaseAdsSignal
     {

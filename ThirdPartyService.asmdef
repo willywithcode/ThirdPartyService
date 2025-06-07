@@ -14,5 +14,18 @@
     "Animancer",
     "DOTween.Modules",
     "MaxSdk.Scripts"
+  ],
+  "precompiledReferences": [
+    "GoogleMobileAds.Unity.dll",
+    "GoogleMobileAds.Ump.dll",
+    "GoogleMobileAds.Ump.Unity.dll",
+    "GoogleMobileAds.dll",
+    "GoogleMobileAds.Common.dll",
+    "GoogleMobileAds.Core.dll",
+    "GoogleMobileAdsNative.Android.dll",
+    "GoogleMobileAdsNative.Common.dll",
+    "GoogleMobileAdsNative.dll",
+    "Newtonsoft.Json.dll",
+    "PubScale.SdkOne.dll"
   ]
 }
