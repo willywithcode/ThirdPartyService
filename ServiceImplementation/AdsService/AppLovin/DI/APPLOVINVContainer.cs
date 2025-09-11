@@ -5,6 +5,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.DI
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Interstitials;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin;
     using VContainer;
 
     public static class APPLOVINVContainer
@@ -16,6 +17,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.DI
             builder.Register<MAXInterstitialsAdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<MAXMRECAdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<MAXRewardedAdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            builder.Register<Setup>(Lifetime.Singleton).AsImplementedInterfaces();
         }
     }
 }

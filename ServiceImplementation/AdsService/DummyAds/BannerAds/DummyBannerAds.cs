@@ -2,7 +2,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds 
     using ThirdPartyService.ServiceImplementation.DI.BannerAds;
 
     public class DummyBannerAds : IBannerAdsService {
-        public void Initialize(bool isAdaptive, BannerPosition position = BannerPosition.BottomCenter) {
+        public void Initialize() {
         }
 
         public void ShowBanner(BannerPosition position) {

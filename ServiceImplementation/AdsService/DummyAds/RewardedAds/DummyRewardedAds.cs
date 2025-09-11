@@ -6,7 +6,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.RewardedAd
 
     public class DummyRewardedAds : IRewardedAdsService
     {
-        public void LoadAd()
+        public void Initialize()
         {
             // Do nothing
         }

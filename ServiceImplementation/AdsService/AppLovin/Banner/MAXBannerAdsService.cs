@@ -14,9 +14,8 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner {
 
         private bool isShown;
 
-        public void Initialize(bool isAdaptive, BannerPosition position = BannerPosition.BottomCenter) {
-            var adViewPosition      = ConvertPosition(position);
-            var adViewConfiguration = new MaxSdkBase.AdViewConfiguration(adViewPosition);
+        public void Initialize() {
+            var adViewConfiguration = new MaxSdkBase.AdViewConfiguration(MaxSdkBase.AdViewPosition.Centered);
 
             MaxSdk.SetBannerBackgroundColor(adUnitId, Color.white);
 

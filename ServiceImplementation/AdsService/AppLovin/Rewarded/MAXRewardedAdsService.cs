@@ -21,7 +21,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded
         private readonly int[]             maxDelay      = { 2, 4, 8 };
         private          bool              isReloadingAd = false;
 
-        public void LoadAd()
+        public void Initialize()
         {
             MaxSdkCallbacks.Rewarded.OnAdLoadedEvent         += this.OnAdLoadedEvent;
             MaxSdkCallbacks.Rewarded.OnAdLoadFailedEvent     += this.OnAdLoadFailedEvent;

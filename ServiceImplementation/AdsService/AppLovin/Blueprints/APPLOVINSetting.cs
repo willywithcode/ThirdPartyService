@@ -11,5 +11,6 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints {
         public string         bannerAdUnitId;
         public BannerPosition bannerPosition = BannerPosition.BottomCenter;
         public string         mrecAdUnitId;
+        public string         aoaAdUnitId;
     }
 }
