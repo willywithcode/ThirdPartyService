@@ -37,7 +37,10 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Interstitials
             this.isInitialized = true;
         }
 
-        public bool IsInitialized() => this.isInitialized;
+        public bool IsInitialized()
+        {
+            return this.isInitialized;
+        }
 
         public void ShowInterstitial(string where, UnityAction onAdClosed = null, UnityAction onAdFailedToShow = null)
         {

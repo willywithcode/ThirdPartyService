@@ -49,10 +49,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded
 
         public bool IsAdReady()
         {
-            if (MaxSdk.IsRewardedAdReady(this.adUnitId))
-            {
-                return true;
-            }
+            if (MaxSdk.IsRewardedAdReady(this.adUnitId)) return true;
             if (this.countReloadVideo < 3 && !this.isReloadingAd)
             {
                 this.LoadRewardedAd();

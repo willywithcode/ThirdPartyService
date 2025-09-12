@@ -1,47 +1,60 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC {
+namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC
+{
     using System;
     using GameFoundation.Scripts.Addressable;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using ThirdPartyService.ServiceImplementation.DI.MRECAds;
 
-    public class MAXMRECAdsService : IMRECAdsService {
-        private string adUnitId;
+    public class MAXMRECAdsService : IMRECAdsService
+    {
+        private readonly string adUnitId;
 
-        public MAXMRECAdsService(IAssetsManager assetsManager) {
-            adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").mrecAdUnitId;
+        public MAXMRECAdsService(IAssetsManager assetsManager)
+        {
+            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").mrecAdUnitId;
         }
 
         private bool isShown;
 
-        public void Initialize() {
-            MaxSdk.CreateMRec(adUnitId, MaxSdkBase.AdViewPosition.Centered);
+        public void Initialize()
+        {
+            MaxSdk.CreateMRec(this.adUnitId, MaxSdkBase.AdViewPosition.Centered);
 
-            MaxSdkCallbacks.MRec.OnAdLoadedEvent      += OnMRecAdLoadedEvent;
-            MaxSdkCallbacks.MRec.OnAdLoadFailedEvent  += OnMRecAdLoadFailedEvent;
-            MaxSdkCallbacks.MRec.OnAdClickedEvent     += OnMRecAdClickedEvent;
-            MaxSdkCallbacks.MRec.OnAdRevenuePaidEvent += OnMRecAdRevenuePaidEvent;
-            MaxSdkCallbacks.MRec.OnAdExpandedEvent    += OnMRecAdExpandedEvent;
-            MaxSdkCallbacks.MRec.OnAdCollapsedEvent   += OnMRecAdCollapsedEvent;
+            MaxSdkCallbacks.MRec.OnAdLoadedEvent      += this.OnMRecAdLoadedEvent;
+            MaxSdkCallbacks.MRec.OnAdLoadFailedEvent  += this.OnMRecAdLoadFailedEvent;
+            MaxSdkCallbacks.MRec.OnAdClickedEvent     += this.OnMRecAdClickedEvent;
+            MaxSdkCallbacks.MRec.OnAdRevenuePaidEvent += this.OnMRecAdRevenuePaidEvent;
+            MaxSdkCallbacks.MRec.OnAdExpandedEvent    += this.OnMRecAdExpandedEvent;
+            MaxSdkCallbacks.MRec.OnAdCollapsedEvent   += this.OnMRecAdCollapsedEvent;
         }
 
-        public void ShowMREC(MRECAdsPosition position) {
-            MaxSdk.UpdateBannerPosition(adUnitId,ConvertPosition(position));
-            MaxSdk.ShowBanner(adUnitId);
-            isShown = true;
+        public void ShowMREC(MRECAdsPosition position)
+        {
+            MaxSdk.UpdateBannerPosition(this.adUnitId, this.ConvertPosition(position));
+            MaxSdk.ShowBanner(this.adUnitId);
+            this.isShown = true;
         }
 
-        public void HideMREC() {
-            MaxSdk.HideBanner(adUnitId);
-            isShown = false;
+        public void HideMREC()
+        {
+            MaxSdk.HideBanner(this.adUnitId);
+            this.isShown = false;
         }
 
-        public bool IsShown()       => isShown;
-        public bool IsInitialized() {
+        public bool IsShown()
+        {
+            return this.isShown;
+        }
+
+        public bool IsInitialized()
+        {
             return MaxSdk.IsInitialized();
         }
 
-        private MaxSdkBase.AdViewPosition ConvertPosition(MRECAdsPosition position) {
-            return position switch {
+        private MaxSdkBase.AdViewPosition ConvertPosition(MRECAdsPosition position)
+        {
+            return position switch
+            {
                 MRECAdsPosition.TopLeft      => MaxSdkBase.AdViewPosition.TopLeft,
                 MRECAdsPosition.TopCenter    => MaxSdkBase.AdViewPosition.TopCenter,
                 MRECAdsPosition.TopRight     => MaxSdkBase.AdViewPosition.TopRight,
@@ -55,7 +68,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC {
             };
         }
 
-#region Callbacks
+        #region Callbacks
 
         private void OnMRecAdCollapsedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
         }
@@ -75,6 +88,6 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC {
         private void OnMRecAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
         }
 
-#endregion
+        #endregion
     }
 }

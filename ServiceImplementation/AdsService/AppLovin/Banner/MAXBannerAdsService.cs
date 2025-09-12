@@ -1,55 +1,66 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner {
+namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner
+{
     using System;
     using GameFoundation.Scripts.Addressable;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using ThirdPartyService.ServiceImplementation.DI.BannerAds;
     using UnityEngine;
 
-    public class MAXBannerAdsService : IBannerAdsService {
-        private string adUnitId;
+    public class MAXBannerAdsService : IBannerAdsService
+    {
+        private readonly string adUnitId;
 
-        public MAXBannerAdsService(IAssetsManager assetsManager) {
+        public MAXBannerAdsService(IAssetsManager assetsManager)
+        {
             this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").bannerAdUnitId;
         }
 
         private bool isShown;
 
-        public void Initialize() {
+        public void Initialize()
+        {
             var adViewConfiguration = new MaxSdkBase.AdViewConfiguration(MaxSdkBase.AdViewPosition.Centered);
 
-            MaxSdk.SetBannerBackgroundColor(adUnitId, Color.white);
+            MaxSdk.SetBannerBackgroundColor(this.adUnitId, Color.white);
 
-            MaxSdkCallbacks.Banner.OnAdLoadedEvent      += OnBannerAdLoadedEvent;
-            MaxSdkCallbacks.Banner.OnAdLoadFailedEvent  += OnBannerAdLoadFailedEvent;
-            MaxSdkCallbacks.Banner.OnAdClickedEvent     += OnBannerAdClickedEvent;
-            MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += OnBannerAdRevenuePaidEvent;
-            MaxSdkCallbacks.Banner.OnAdExpandedEvent    += OnBannerAdExpandedEvent;
-            MaxSdkCallbacks.Banner.OnAdCollapsedEvent   += OnBannerAdCollapsedEvent;
+            MaxSdkCallbacks.Banner.OnAdLoadedEvent      += this.OnBannerAdLoadedEvent;
+            MaxSdkCallbacks.Banner.OnAdLoadFailedEvent  += this.OnBannerAdLoadFailedEvent;
+            MaxSdkCallbacks.Banner.OnAdClickedEvent     += this.OnBannerAdClickedEvent;
+            MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += this.OnBannerAdRevenuePaidEvent;
+            MaxSdkCallbacks.Banner.OnAdExpandedEvent    += this.OnBannerAdExpandedEvent;
+            MaxSdkCallbacks.Banner.OnAdCollapsedEvent   += this.OnBannerAdCollapsedEvent;
         }
 
-        public void ShowBanner(BannerPosition bannerPosition = BannerPosition.BottomCenter) {
-            var adViewPosition = ConvertPosition(bannerPosition);
-            MaxSdk.UpdateBannerPosition(adUnitId, adViewPosition);
-            MaxSdk.ShowBanner(adUnitId);
-            isShown = true;
+        public void ShowBanner(BannerPosition bannerPosition = BannerPosition.BottomCenter)
+        {
+            var adViewPosition = this.ConvertPosition(bannerPosition);
+            MaxSdk.UpdateBannerPosition(this.adUnitId, adViewPosition);
+            MaxSdk.ShowBanner(this.adUnitId);
+            this.isShown = true;
         }
 
-        public void HideBanner() {
-            MaxSdk.HideBanner(adUnitId);
-            isShown = false;
+        public void HideBanner()
+        {
+            MaxSdk.HideBanner(this.adUnitId);
+            this.isShown = false;
         }
 
-        public float GetBannerHeight() {
+        public float GetBannerHeight()
+        {
             throw new NotImplementedException();
         }
 
-        public bool IsInitialized() {
+        public bool IsInitialized()
+        {
             return MaxSdk.IsInitialized();
         }
 
-        public bool IsShown() => isShown;
+        public bool IsShown()
+        {
+            return this.isShown;
+        }
 
-#region Callbacks
+        #region Callbacks
 
         private void OnBannerAdCollapsedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
         }
@@ -69,10 +80,12 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner {
         private void OnBannerAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
         }
 
-#endregion
+        #endregion
 
-        private MaxSdkBase.AdViewPosition ConvertPosition(BannerPosition position) {
-            return position switch {
+        private MaxSdkBase.AdViewPosition ConvertPosition(BannerPosition position)
+        {
+            return position switch
+            {
                 BannerPosition.TopLeft      => MaxSdkBase.AdViewPosition.TopLeft,
                 BannerPosition.TopCenter    => MaxSdkBase.AdViewPosition.TopCenter,
                 BannerPosition.TopRight     => MaxSdkBase.AdViewPosition.TopRight,
@@ -82,7 +95,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner {
                 BannerPosition.BottomLeft   => MaxSdkBase.AdViewPosition.BottomLeft,
                 BannerPosition.BottomCenter => MaxSdkBase.AdViewPosition.BottomCenter,
                 BannerPosition.BottomRight  => MaxSdkBase.AdViewPosition.BottomRight,
-                _                           => MaxSdkBase.AdViewPosition.BottomCenter,
+                _                           => MaxSdkBase.AdViewPosition.BottomCenter
             };
         }
     }

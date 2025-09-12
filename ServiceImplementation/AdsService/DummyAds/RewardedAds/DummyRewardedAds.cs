@@ -17,9 +17,6 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.RewardedAd
             Debug.LogWarning("DummyRewardedAds: ShowAd called, but this is a dummy implementation.");
         }
 
-        public bool IsAdReady()
-        {
-            return true;
-        }
+        public bool IsAdReady() => true;
     }
 }

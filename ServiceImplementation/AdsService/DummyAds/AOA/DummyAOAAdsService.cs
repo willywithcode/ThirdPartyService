@@ -1,5 +1,24 @@
-namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.AOA {
-    public class DummyAOAAdsService {
-        
+namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.AOA
+{
+    using ThirdPartyService.ServiceImplementation.DI.AOA;
+    using UnityEngine;
+
+    public class DummyAOAAdsService : IAOAAdsService
+    {
+        public void Initialize()
+        {
+        }
+
+        public void ShowAd()
+        {
+            Debug.Log("DummyAOAAdsService: ShowAd called");
+        }
+
+        public void HideAd()
+        {
+        }
+
+        public bool IsShown() => false;
+        public bool IsReady() => true;
     }
 }

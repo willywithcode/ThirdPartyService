@@ -1,4 +1,5 @@
-namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin {
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
+{
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.AOA;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner;
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Interstitials;
@@ -6,7 +7,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin {
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded;
     using VContainer.Unity;
 
-    public class Setup : IInitializable {
+    public class Setup : IInitializable
+    {
         private readonly MAXAOAAdsService           aoaAdService;
         private readonly MAXBannerAdsService        bannerAdsService;
         private readonly MAXInterstitialsAdsService interstitialsAdsService;
@@ -19,7 +21,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin {
             MAXInterstitialsAdsService interstitialsAdsService,
             MAXMRECAdsService          mrecAdsService,
             MAXRewardedAdsService      rewardedAdsService
-        ) {
+        )
+        {
             this.aoaAdService            = aoaAdService;
             this.bannerAdsService        = bannerAdsService;
             this.interstitialsAdsService = interstitialsAdsService;
@@ -27,14 +30,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin {
             this.rewardedAdsService      = rewardedAdsService;
         }
 
-        public void Initialize() {
-            MaxSdkCallbacks.OnSdkInitializedEvent += (MaxSdkBase.SdkConfiguration sdkConfiguration) => {
-                                                         aoaAdService.Initialize();
-                                                         bannerAdsService.Initialize();
-                                                         interstitialsAdsService.Initialize();
-                                                         mrecAdsService.Initialize();
-                                                         rewardedAdsService.Initialize();
-                                                     };
+        public void Initialize()
+        {
+            MaxSdkCallbacks.OnSdkInitializedEvent += sdkConfiguration =>
+            {
+                this.aoaAdService.Initialize();
+                this.bannerAdsService.Initialize();
+                this.interstitialsAdsService.Initialize();
+                this.mrecAdsService.Initialize();
+                this.rewardedAdsService.Initialize();
+            };
 
             //MaxSdk.SetSdkKey(SDK_KEY);
             MaxSdk.SetUserId("USER_ID");
