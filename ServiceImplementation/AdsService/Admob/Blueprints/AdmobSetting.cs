@@ -11,5 +11,6 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints
         public string interstitialAdUnitId;
         public string mrecAdUnitId;
         public string rewardedAdUnitId;
+        public string nativeAdUnitId;
     }
 }

@@ -1,11 +1,18 @@
 namespace ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds
 {
+    using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
+    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.DI.RewardedAds;
     using UnityEngine.Events;
 
     public class AdmobRewardedAds : IRewardedAdsService
     {
+        private string adUnitId;
+
+        public AdmobRewardedAds(IAssetsManager assetsManager) {
+            this.adUnitId = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").rewardedAdUnitId;
+        }
         private RewardedAd rewardedAd;
 
         public void Initialize()
@@ -19,7 +26,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds
             var adRequest = new AdRequest();
 
             // Send the request to load the ad.
-            RewardedAd.Load("AD_UNIT_ID", adRequest, (ad, error) =>
+            RewardedAd.Load(this.adUnitId, adRequest, (ad, error) =>
             {
                 if (error != null)
                     // The ad failed to load.

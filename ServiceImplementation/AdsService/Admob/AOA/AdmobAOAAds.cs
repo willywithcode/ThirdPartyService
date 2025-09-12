@@ -3,6 +3,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
     using System;
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
+    using GoogleMobileAds.Common;
     using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.DI.AOA;
     using UnityEngine;
@@ -24,38 +25,17 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
         public void Initialize()
         {
             this.HideAd();
-
-            Debug.Log("Loading app open ad.");
-            var adRequest = new AdRequest();
-
-            AppOpenAd.Load(this.adUnitId, adRequest, (ad, error) =>
+            AppStateEventNotifier.AppStateChanged += (state) =>
             {
-                // If the operation failed with a reason.
-                if (error != null)
+                if (state == AppState.Foreground)
                 {
-                    Debug.LogError("App open ad failed to load an ad with error : "
-                        + error);
-                    return;
+                    if (!this.IsReady())
+                    {
+                        this.ShowAd();
+                    }
                 }
-
-                // If the operation failed for unknown reasons.
-                // This is an unexpected error, please report this bug if it happens.
-                if (ad == null)
-                {
-                    Debug.LogError("Unexpected error: App open ad load event fired with " + " null ad and null error.");
-                    return;
-                }
-
-                // The operation completed successfully.
-                Debug.Log("App open ad loaded with response : " + ad.GetResponseInfo());
-                this.appOpenAd = ad;
-
-                // App open ads can be preloaded for up to 4 hours.
-                this.expireTime = DateTime.Now + this.TIMEOUT;
-
-                // Register to ad events to extend functionality.
-                this.RegisterEventHandlers(ad);
-            });
+            };
+            this.LoadAppOpenAd();
         }
 
         public void ShowAd()
@@ -89,6 +69,40 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
             return this.appOpenAd != null && DateTime.Now < this.expireTime;
         }
 
+        private void LoadAppOpenAd() {
+            Debug.Log("Loading app open ad.");
+            var adRequest = new AdRequest();
+
+            AppOpenAd.Load(this.adUnitId, adRequest, (ad, error) =>
+                                                     {
+                                                         // If the operation failed with a reason.
+                                                         if (error != null)
+                                                         {
+                                                             Debug.LogError("App open ad failed to load an ad with error : "
+                                                                            + error);
+                                                             return;
+                                                         }
+
+                                                         // If the operation failed for unknown reasons.
+                                                         // This is an unexpected error, please report this bug if it happens.
+                                                         if (ad == null)
+                                                         {
+                                                             Debug.LogError("Unexpected error: App open ad load event fired with " + " null ad and null error.");
+                                                             return;
+                                                         }
+
+                                                         // The operation completed successfully.
+                                                         Debug.Log("App open ad loaded with response : " + ad.GetResponseInfo());
+                                                         this.appOpenAd = ad;
+
+                                                         // App open ads can be preloaded for up to 4 hours.
+                                                         this.expireTime = DateTime.Now + this.TIMEOUT;
+
+                                                         // Register to ad events to extend functionality.
+                                                         this.RegisterEventHandlers(ad);
+                                                     });
+        }
+
         #region Callbacks
 
         private void RegisterEventHandlers(AppOpenAd ad)
@@ -120,11 +134,14 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
             {
                 Debug.Log("App open ad full screen content closed.");
                 this.isShown = false;
+                this.LoadAppOpenAd();
             };
             // Raised when the ad failed to open full screen content.
             ad.OnAdFullScreenContentFailed += error =>
             {
                 Debug.LogError("App open ad failed to open full screen content " + "with error : " + error);
+                this.isShown = false;
+                this.LoadAppOpenAd();
             };
         }
 
