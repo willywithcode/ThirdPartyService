@@ -10,9 +10,12 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DI
     {
         public static void RegisterIAP(this IContainerBuilder builder)
         {
+            #if UNITY_EDITOR
             builder.Register<DummyIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
+            #else
             #if UNITY_PURCHASING
             builder.Register<UnityIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
+            #endif
             #endif
         }
     }

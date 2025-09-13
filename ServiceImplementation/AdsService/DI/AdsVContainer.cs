@@ -17,7 +17,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
     {
         public static void RegisterAds(this IContainerBuilder builder)
         {
+            #if UNITY_EDITOR
             builder.RegisterDummyAds();
+            #else
             #if MAX
             builder.RegisterAPPLOVINAds();
             #endif
@@ -26,6 +28,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             #endif
             #if IronSource
             builder.RegisterIronSourceAds();
+            #endif
             #endif
         }
     }
