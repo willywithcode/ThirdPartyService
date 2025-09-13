@@ -1,4 +1,4 @@
-namespace ThirdPartyService.ServiceImplementation.DI.MRECAds {
+namespace ThirdPartyService.Core.AdsService.MRECAds {
     public interface IMRECAdsService {
         public void Initialize();
         public void ShowMREC(MRECAdsPosition position);

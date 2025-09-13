@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.MRECAds
 {
-    using ThirdPartyService.ServiceImplementation.DI.MRECAds;
+    using ThirdPartyService.Core.AdsService.MRECAds;
     using UnityEngine;
 
     public class DummyMRECAds : IMRECAdsService

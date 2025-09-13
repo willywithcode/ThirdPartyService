@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
 {
     using System;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.MRECAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using ThirdPartyService.Core.AdsService.MRECAds;
 
     public class MAXMRECAdsService : IMRECAdsService
     {

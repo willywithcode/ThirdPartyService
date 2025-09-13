@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.MRECAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.MRECAds
 {
     using com.unity3d.mediation;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.MRECAds;
+    using ThirdPartyService.Core.AdsService.MRECAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints;
 
     public class IronSourceMRECAds : IMRECAdsService
     {

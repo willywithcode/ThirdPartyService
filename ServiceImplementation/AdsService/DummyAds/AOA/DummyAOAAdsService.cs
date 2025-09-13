@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.AOA
 {
-    using ThirdPartyService.ServiceImplementation.DI.AOA;
+    using ThirdPartyService.Core.AdsService.AOA;
     using UnityEngine;
 
     public class DummyAOAAdsService : IAOAAdsService

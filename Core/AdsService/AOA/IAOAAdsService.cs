@@ -1,4 +1,4 @@
-namespace ThirdPartyService.ServiceImplementation.DI.AOA {
+namespace ThirdPartyService.Core.AdsService.AOA {
     public interface IAOAAdsService {
         public void Initialize();
         public void ShowAd();

@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds
 {
-    using ThirdPartyService.ServiceImplementation.DI.BannerAds;
+    using ThirdPartyService.Core.AdsService.BannerAds;
 
     public class DummyBannerAds : IBannerAdsService
     {

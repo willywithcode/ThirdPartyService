@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds
 {
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.Core.AdsService.InterstitialsAds;
     using UnityEngine;
     using UnityEngine.Events;
 

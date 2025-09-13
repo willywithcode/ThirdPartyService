@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Interstitials
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstitials
 {
     using System;
     using Cysharp.Threading.Tasks;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using ThirdPartyService.Core.AdsService.InterstitialsAds;
     using UnityEngine.Events;
 
     public class MAXInterstitialsAdsService : IInterstitialAdsService

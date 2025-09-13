@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.InterstitialsAds
 {
-    using ThirdPartyService.ServiceImplementation.DI.InterstitialsAds;
+    using ThirdPartyService.Core.AdsService.InterstitialsAds;
     using UnityEngine;
     using UnityEngine.Events;
 

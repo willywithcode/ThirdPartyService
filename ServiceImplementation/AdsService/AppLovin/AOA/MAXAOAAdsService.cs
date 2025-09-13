@@ -1,8 +1,8 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.AOA
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
 {
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.AOA;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using ThirdPartyService.Core.AdsService.AOA;
 
     public class MAXAOAAdsService : IAOAAdsService
     {

@@ -1,4 +1,4 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints
 {
     using UnityEngine;
 

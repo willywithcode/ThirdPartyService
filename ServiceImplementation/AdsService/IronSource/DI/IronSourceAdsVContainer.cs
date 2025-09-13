@@ -1,14 +1,15 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.DI
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.Banner;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.InterstitialsAds;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.MRECAds;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.RewardedAds;
-    using VContainer.Unity;
+    using ThirdParty.ServiceImplementation.AdsService.IronSource;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.Banner;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.MRECAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.RewardedAds;
+    using VContainer;
 
     public static class IronSourceAdsVContainer
     {
-        public static void RegisterIronSourceAds(this VContainer.IContainerBuilder builder)
+        public static void RegisterIronSourceAds(this IContainerBuilder builder)
         {
             builder.Register<IronSourceBannerAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<IronSourceInterstitialsAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();

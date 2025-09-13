@@ -1,4 +1,4 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.Blueprints
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints
 {
     using UnityEngine;
 

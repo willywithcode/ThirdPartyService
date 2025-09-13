@@ -1,8 +1,8 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.RewardedAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.RewardedAds
 {
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.RewardedAds;
+    using ThirdPartyService.Core.AdsService.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints;
     using Unity.Services.LevelPlay;
     using UnityEngine.Events;
 

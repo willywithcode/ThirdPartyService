@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
 {
     using System;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.BannerAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using ThirdPartyService.Core.AdsService.BannerAds;
     using UnityEngine;
 
     public class MAXBannerAdsService : IBannerAdsService

@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob {
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob {
     using GoogleMobileAds.Api;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.AOA;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Banner;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.NativeAds;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds;
     using UnityEngine;
     using VContainer.Unity;
 

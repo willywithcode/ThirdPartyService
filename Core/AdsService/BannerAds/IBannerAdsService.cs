@@ -1,4 +1,4 @@
-namespace ThirdPartyService.ServiceImplementation.DI.BannerAds {
+namespace ThirdPartyService.Core.AdsService.BannerAds {
     public interface IBannerAdsService {
         public void  Initialize();
         public void  ShowBanner(BannerPosition position = BannerPosition.BottomCenter);

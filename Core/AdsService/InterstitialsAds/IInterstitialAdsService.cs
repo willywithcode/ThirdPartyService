@@ -1,4 +1,4 @@
-namespace ThirdPartyService.ServiceImplementation.DI.InterstitialsAds
+namespace ThirdPartyService.Core.AdsService.InterstitialsAds
 {
     using UnityEngine.Events;
 

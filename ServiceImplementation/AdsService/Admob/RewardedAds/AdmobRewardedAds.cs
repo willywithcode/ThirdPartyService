@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 {
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.Core.AdsService.RewardedAds;
     using UnityEngine.Events;
 
     public class AdmobRewardedAds : IRewardedAdsService

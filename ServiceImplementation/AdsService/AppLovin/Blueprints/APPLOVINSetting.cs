@@ -1,6 +1,6 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints
 {
-    using ThirdPartyService.ServiceImplementation.DI.BannerAds;
+    using ThirdPartyService.Core.AdsService.BannerAds;
     using UnityEngine;
 
     [CreateAssetMenu(fileName = "APPLOVINSetting", menuName = "ThirdParty/ServiceImplementation/AdsService/AppLovin/APPLOVINSetting")]

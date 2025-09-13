@@ -1,6 +1,6 @@
 namespace ThirdParty.ServiceImplementation.AdsService.DummyAds.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.DummyAds.NativeAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.NativeAds;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.InterstitialsAds;

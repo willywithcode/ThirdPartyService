@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.InterstitialsAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.InterstitialsAds
 {
     using com.unity3d.mediation;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.InterstitialsAds;
+    using ThirdPartyService.Core.AdsService.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints;
     using UnityEngine.Events;
 
     public class IronSourceInterstitialsAds : IInterstitialAdsService

@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.DI
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.AOA;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Banner;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Interstitials;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.MREC;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstitials;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded;
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin;
     using VContainer;
 

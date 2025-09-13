@@ -1,8 +1,8 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.NativeAds
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds
 {
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.Core.AdsService.NativeAds;
     using UnityEngine;
 

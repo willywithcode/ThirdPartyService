@@ -1,9 +1,9 @@
-namespace ThirdParty.ServiceImplementation.AdsService.IronSource.Banner
+namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Banner
 {
     using com.unity3d.mediation;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.IronSource.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.BannerAds;
+    using ThirdPartyService.Core.AdsService.BannerAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints;
 
     public class IronSourceBannerAds : IBannerAdsService
     {

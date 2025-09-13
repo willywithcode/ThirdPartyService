@@ -1,10 +1,11 @@
-namespace ThirdPartyService.ServiceImplementation.DI.RewardedAds {
+namespace ThirdPartyService.Core.AdsService.RewardedAds
+{
     using UnityEngine.Events;
 
-    public interface IRewardedAdsService {
+    public interface IRewardedAdsService
+    {
         public void Initialize();
         public void ShowAd(UnityAction<bool> onAdComplete, string where);
         public bool IsAdReady();
-
     }
 }

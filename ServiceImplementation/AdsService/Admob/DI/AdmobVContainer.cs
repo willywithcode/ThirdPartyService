@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.DI
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.Admob.AOA;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Banner;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.NativeAds;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds;
     using VContainer;
 
     public static class AdmobVContainer

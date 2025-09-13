@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.AppLovin.Rewarded
+namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 {
     using System;
     using Cysharp.Threading.Tasks;
     using GameFoundation.Scripts.Addressable;
-    using ThirdParty.ServiceImplementation.AdsService.AppLovin.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using ThirdPartyService.Core.AdsService.RewardedAds;
     using UnityEngine.Events;
 
     public class MAXRewardedAdsService : IRewardedAdsService

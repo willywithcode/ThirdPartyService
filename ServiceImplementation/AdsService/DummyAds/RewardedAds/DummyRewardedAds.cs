@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.RewardedAds
 {
-    using ThirdPartyService.ServiceImplementation.DI.RewardedAds;
+    using ThirdPartyService.Core.AdsService.RewardedAds;
     using UnityEngine;
     using UnityEngine.Events;
 

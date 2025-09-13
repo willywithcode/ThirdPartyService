@@ -1,10 +1,10 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.Banner
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
 {
     using System;
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.BannerAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.Core.AdsService.BannerAds;
 
     public class AdmobBannerAds : IBannerAdsService
     {

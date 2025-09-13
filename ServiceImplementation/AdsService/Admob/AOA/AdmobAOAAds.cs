@@ -1,11 +1,11 @@
-namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
+namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
 {
     using System;
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
     using GoogleMobileAds.Common;
-    using ThirdParty.ServiceImplementation.AdsService.Admob.Blueprints;
-    using ThirdPartyService.ServiceImplementation.DI.AOA;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.Core.AdsService.AOA;
     using UnityEngine;
 
     public class AdmobAOAAds : IAOAAdsService
