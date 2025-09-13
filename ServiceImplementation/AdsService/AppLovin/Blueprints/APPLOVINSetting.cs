@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints
 {
     using ThirdPartyService.Core.AdsService.BannerAds;
@@ -16,3 +17,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints
         public string         aoaAdUnitId;
     }
 }
+#endif

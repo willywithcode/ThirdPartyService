@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
 {
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA;
@@ -47,3 +48,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin
         }
     }
 }
+#endif

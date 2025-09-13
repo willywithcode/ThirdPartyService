@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
 {
     using System;
@@ -100,3 +101,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
         }
     }
 }
+#endif

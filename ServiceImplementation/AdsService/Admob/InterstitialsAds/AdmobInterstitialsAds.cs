@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds
 {
+    #if Admob
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
@@ -117,4 +118,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             };
         }
     }
+    #endif
 }

@@ -1,3 +1,4 @@
+#if IronSource
 namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprints
 {
     using UnityEngine;
@@ -12,3 +13,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Blueprin
         public string mrecAdKey;
     }
 }
+#endif

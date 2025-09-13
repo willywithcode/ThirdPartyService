@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
 {
+    #if Admob
     using System;
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
@@ -100,4 +101,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             };
         }
     }
+    #endif
 }

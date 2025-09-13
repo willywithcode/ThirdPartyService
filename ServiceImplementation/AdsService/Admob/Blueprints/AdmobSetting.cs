@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints
 {
+    #if Admob
     using UnityEngine;
 
     [CreateAssetMenu(fileName = "AdmodSetting", menuName = "ThirdParty/ServiceImplementation/AdsService/Admob/AdmodSetting")]
@@ -13,4 +14,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints
         public string rewardedAdUnitId;
         public string nativeAdUnitId;
     }
+    #endif
 }

@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
 {
+    #if Admob
     using System;
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
@@ -54,7 +55,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
             {
                 this.appOpenAd.Destroy();
                 this.appOpenAd = null;
-                this.isShown   = false;
+                this.isShown = false;
             }
         }
 
@@ -147,4 +148,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
 
         #endregion
     }
+    #endif
 }

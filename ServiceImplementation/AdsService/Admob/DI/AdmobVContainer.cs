@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.DI
 {
+    #if Admob
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
@@ -19,4 +20,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.DI
             builder.Register<Setup>(Lifetime.Singleton).AsImplementedInterfaces();
         }
     }
+    #endif
 }

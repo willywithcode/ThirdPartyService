@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstitials
 {
     using System;
@@ -114,3 +115,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
         #endregion
     }
 }
+#endif

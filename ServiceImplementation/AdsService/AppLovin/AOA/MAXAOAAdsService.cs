@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
 {
     using GameFoundation.Scripts.Addressable;
@@ -54,3 +55,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
         }
     }
 }
+#endif

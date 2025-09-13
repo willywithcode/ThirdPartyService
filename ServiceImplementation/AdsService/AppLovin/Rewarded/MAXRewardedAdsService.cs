@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 {
     using System;
@@ -117,3 +118,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
         #endregion
     }
 }
+#endif

@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds
 {
+    #if Admob
     using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
@@ -119,4 +120,5 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds
             };
         }
     }
+    #endif
 }

@@ -1,3 +1,4 @@
+#if IronSource
 namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.DI
 {
     using ThirdParty.ServiceImplementation.AdsService.IronSource;
@@ -19,3 +20,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.DI
         }
     }
 }
+#endif

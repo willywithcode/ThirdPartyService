@@ -1,6 +1,6 @@
-namespace ThirdParty.ServiceImplementation.AdsService.DI
+namespace ThirdPartyService.ServiceImplementation.AdsService.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.DummyAds.DI;
+    using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.DI;
     using VContainer;
     #if MAX
     using ThirdParty.ServiceImplementation.AdsService.AppLovin.DI;

@@ -1,3 +1,4 @@
+#if IronSource
 namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.InterstitialsAds
 {
     using com.unity3d.mediation;
@@ -87,3 +88,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Intersti
         }
     }
 }
+#endif

@@ -1,7 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService
 {
     using System.Collections.Generic;
-    using ThirdPartyService.ServiceImplementation.AdsService.LocalDatas;
     using ThirdPartyService.Core.AdsService;
     using ThirdPartyService.Core.AdsService.AOA;
     using ThirdPartyService.Core.AdsService.BannerAds;
@@ -9,10 +8,19 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
     using ThirdPartyService.Core.AdsService.MRECAds;
     using ThirdPartyService.Core.AdsService.NativeAds;
     using ThirdPartyService.Core.AdsService.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.LocalDatas;
 
     public class AdsService : IAdsService
     {
-        private readonly AdsLocalDataService adsLocalDataService;
+        #region Inject
+
+        private readonly AdsLocalDataService                  adsLocalDataService;
+        private readonly IEnumerable<IAOAAdsService>          aoaAdsServices;
+        private readonly IEnumerable<IBannerAdsService>       bannerAdsServices;
+        private readonly IEnumerable<IInterstitialAdsService> interstitialsAdsServices;
+        private readonly IEnumerable<IMRECAdsService>         mrecAdsServices;
+        private readonly IEnumerable<INativeAdsService>       nativeAdsServices;
+        private readonly IEnumerable<IRewardedAdsService>     rewardedAdsServices;
 
         public AdsService(
             AdsLocalDataService                  adsLocalDataService,
@@ -24,8 +32,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
             IEnumerable<IRewardedAdsService>     rewardedAdsServices
         )
         {
-            this.adsLocalDataService = adsLocalDataService;
+            this.adsLocalDataService      = adsLocalDataService;
+            this.aoaAdsServices           = aoaAdsServices;
+            this.bannerAdsServices        = bannerAdsServices;
+            this.interstitialsAdsServices = interstitialsAdsServices;
+            this.mrecAdsServices          = mrecAdsServices;
+            this.nativeAdsServices        = nativeAdsServices;
+            this.rewardedAdsServices      = rewardedAdsServices;
         }
+
+        #endregion
 
         public void RemoveAds()
         {

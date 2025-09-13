@@ -1,6 +1,7 @@
 namespace ThirdPartyService.ServiceImplementation.DI
 {
-    using ThirdParty.ServiceImplementation.AdsService.DI;
+    using ThirdPartyService.ServiceImplementation.AdsService.DI;
+    using ThirdPartyService.ServiceImplementation.IAPService.DI;
     using VContainer;
 
     public static class ThirdPartyVContainer
@@ -8,6 +9,7 @@ namespace ThirdPartyService.ServiceImplementation.DI
         public static void RegisterThirdPartyServices(this IContainerBuilder builder)
         {
             builder.RegisterAds();
+            builder.RegisterIAP();
         }
     }
 }

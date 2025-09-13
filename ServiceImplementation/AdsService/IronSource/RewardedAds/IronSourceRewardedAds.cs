@@ -1,3 +1,4 @@
+#if IronSource
 namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.RewardedAds
 {
     using GameFoundation.Scripts.Addressable;
@@ -94,3 +95,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Rewarded
         }
     }
 }
+#endif

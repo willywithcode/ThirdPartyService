@@ -1,3 +1,4 @@
+#if MAX
 namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
 {
     using System;
@@ -91,3 +92,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
         #endregion
     }
 }
+#endif

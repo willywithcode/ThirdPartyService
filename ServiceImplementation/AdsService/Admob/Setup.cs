@@ -1,4 +1,5 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob {
+    #if Admob
     using GoogleMobileAds.Api;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
@@ -32,23 +33,24 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob {
         public void Initialize() {
             MobileAds.SetiOSAppPauseOnBackground(true);
             MobileAds.Initialize((InitializationStatus initstatus) => {
-                                     if (initstatus == null) {
-                                         Debug.LogError("Google Mobile Ads initialization failed.");
-                                         return;
-                                     }
+                if (initstatus == null) {
+                    Debug.LogError("Google Mobile Ads initialization failed.");
+                    return;
+                }
 
-                                     Debug.Log("Google Mobile Ads initialization complete.");
+                Debug.Log("Google Mobile Ads initialization complete.");
 
-                                     // Google Mobile Ads events are raised off the Unity Main thread. If you need to
-                                     // access UnityEngine objects after initialization,
-                                     // use MobileAdsEventExecutor.ExecuteInUpdate(). For more information, see:
-                                     // https://developers.google.com/admob/unity/global-settings#raise_ad_events_on_the_unity_main_thread
-                                     this.aoaAds.Initialize();
-                                     this.bannerAds.Initialize();
-                                     this.interstitialsAds.Initialize();
-                                     this.rewardedAds.Initialize();
-                                     this.nativeAds.Initialize();
-                                 });
+                // Google Mobile Ads events are raised off the Unity Main thread. If you need to
+                // access UnityEngine objects after initialization,
+                // use MobileAdsEventExecutor.ExecuteInUpdate(). For more information, see:
+                // https://developers.google.com/admob/unity/global-settings#raise_ad_events_on_the_unity_main_thread
+                this.aoaAds.Initialize();
+                this.bannerAds.Initialize();
+                this.interstitialsAds.Initialize();
+                this.rewardedAds.Initialize();
+                this.nativeAds.Initialize();
+            });
         }
     }
+    #endif
 }

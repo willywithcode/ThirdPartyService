@@ -1,3 +1,4 @@
+#if IronSource
 namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.MRECAds
 {
     using com.unity3d.mediation;
@@ -109,3 +110,4 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.MRECAds
         }
     }
 }
+#endif
