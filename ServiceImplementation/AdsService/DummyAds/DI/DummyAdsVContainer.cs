@@ -1,5 +1,6 @@
 namespace ThirdParty.ServiceImplementation.AdsService.DummyAds.DI
 {
+    using ThirdParty.ServiceImplementation.AdsService.DummyAds.NativeAds;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.InterstitialsAds;
@@ -16,6 +17,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.DummyAds.DI
             builder.Register<DummyInterstitialAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<DummyMRECAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<DummyRewardedAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            builder.Register<DummyNativeAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         }
     }
 }

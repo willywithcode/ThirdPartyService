@@ -13,7 +13,8 @@
     "spine-unity-editor",
     "Animancer",
     "DOTween.Modules",
-    "MaxSdk.Scripts"
+    "MaxSdk.Scripts",
+    "Unity.LevelPlay"
   ],
   "precompiledReferences": [
     "GoogleMobileAds.Unity.dll",

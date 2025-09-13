@@ -9,7 +9,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.Banner
     public class AdmobBannerAds : IBannerAdsService
     {
         private readonly string adUnitId;
-        private          bool   isCollapseBanner;
+        private readonly bool   isCollapseBanner;
 
         public AdmobBannerAds(IAssetsManager assetsManager)
         {
@@ -62,10 +62,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.Banner
 
         public void ShowBanner(BannerPosition position = BannerPosition.BottomCenter)
         {
-            if (position != BannerPosition.BottomCenter)
-            {
-                this.bannerView.SetPosition(this.Convert(position));
-            }
+            if (position != BannerPosition.BottomCenter) this.bannerView.SetPosition(this.Convert(position));
             this.bannerView.Show();
         }
 
@@ -99,7 +96,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.Banner
                 BannerPosition.TopCenter    => AdPosition.Top,
                 BannerPosition.TopRight     => AdPosition.TopRight,
                 BannerPosition.TopLeft      => AdPosition.TopLeft,
-                _                           => AdPosition.Bottom,
+                _                           => AdPosition.Bottom
             };
         }
     }

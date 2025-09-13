@@ -28,12 +28,8 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
             AppStateEventNotifier.AppStateChanged += (state) =>
             {
                 if (state == AppState.Foreground)
-                {
                     if (!this.IsReady())
-                    {
                         this.ShowAd();
-                    }
-                }
             };
             this.LoadAppOpenAd();
         }
@@ -62,45 +58,49 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.AOA
             }
         }
 
-        public bool IsShown() => this.isShown;
+        public bool IsShown()
+        {
+            return this.isShown;
+        }
 
         public bool IsReady()
         {
             return this.appOpenAd != null && DateTime.Now < this.expireTime;
         }
 
-        private void LoadAppOpenAd() {
+        private void LoadAppOpenAd()
+        {
             Debug.Log("Loading app open ad.");
             var adRequest = new AdRequest();
 
             AppOpenAd.Load(this.adUnitId, adRequest, (ad, error) =>
-                                                     {
-                                                         // If the operation failed with a reason.
-                                                         if (error != null)
-                                                         {
-                                                             Debug.LogError("App open ad failed to load an ad with error : "
-                                                                            + error);
-                                                             return;
-                                                         }
+            {
+                // If the operation failed with a reason.
+                if (error != null)
+                {
+                    Debug.LogError("App open ad failed to load an ad with error : "
+                        + error);
+                    return;
+                }
 
-                                                         // If the operation failed for unknown reasons.
-                                                         // This is an unexpected error, please report this bug if it happens.
-                                                         if (ad == null)
-                                                         {
-                                                             Debug.LogError("Unexpected error: App open ad load event fired with " + " null ad and null error.");
-                                                             return;
-                                                         }
+                // If the operation failed for unknown reasons.
+                // This is an unexpected error, please report this bug if it happens.
+                if (ad == null)
+                {
+                    Debug.LogError("Unexpected error: App open ad load event fired with " + " null ad and null error.");
+                    return;
+                }
 
-                                                         // The operation completed successfully.
-                                                         Debug.Log("App open ad loaded with response : " + ad.GetResponseInfo());
-                                                         this.appOpenAd = ad;
+                // The operation completed successfully.
+                Debug.Log("App open ad loaded with response : " + ad.GetResponseInfo());
+                this.appOpenAd = ad;
 
-                                                         // App open ads can be preloaded for up to 4 hours.
-                                                         this.expireTime = DateTime.Now + this.TIMEOUT;
+                // App open ads can be preloaded for up to 4 hours.
+                this.expireTime = DateTime.Now + this.TIMEOUT;
 
-                                                         // Register to ad events to extend functionality.
-                                                         this.RegisterEventHandlers(ad);
-                                                     });
+                // Register to ad events to extend functionality.
+                this.RegisterEventHandlers(ad);
+            });
         }
 
         #region Callbacks

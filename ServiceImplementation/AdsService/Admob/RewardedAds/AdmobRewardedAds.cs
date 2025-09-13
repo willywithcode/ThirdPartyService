@@ -8,11 +8,13 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.RewardedAds
 
     public class AdmobRewardedAds : IRewardedAdsService
     {
-        private string adUnitId;
+        private readonly string adUnitId;
 
-        public AdmobRewardedAds(IAssetsManager assetsManager) {
+        public AdmobRewardedAds(IAssetsManager assetsManager)
+        {
             this.adUnitId = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").rewardedAdUnitId;
         }
+
         private RewardedAd rewardedAd;
 
         public void Initialize()

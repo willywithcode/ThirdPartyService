@@ -9,7 +9,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds
 
     public class AdmobInterstitialsAds : IInterstitialAdsService
     {
-        private string adUnitId;
+        private readonly string adUnitId;
 
         public AdmobInterstitialsAds(IAssetsManager assetsManager)
         {
@@ -32,21 +32,23 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds
             this.Load();
         }
 
-        public bool IsInitialized() => this.interstitialAd != null;
+        public bool IsInitialized()
+        {
+            return this.interstitialAd != null;
+        }
 
         public void ShowInterstitial(string where, UnityAction onAdClosed = null, UnityAction onAdFailedToShow = null)
         {
             if (this.interstitialAd != null && this.interstitialAd.CanShowAd())
-            {
                 this.interstitialAd.Show();
-            }
             else
-            {
                 onAdFailedToShow?.Invoke();
-            }
         }
 
-        public bool IsInterstitialReady() => this.interstitialAd != null && this.interstitialAd.CanShowAd();
+        public bool IsInterstitialReady()
+        {
+            return this.interstitialAd != null && this.interstitialAd.CanShowAd();
+        }
 
         private void Load()
         {
@@ -82,7 +84,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds
         private void RegisterEventHandlers(InterstitialAd ad)
         {
             // Raised when the ad is estimated to have earned money.
-            ad.OnAdPaid += (AdValue adValue) =>
+            ad.OnAdPaid += adValue =>
             {
             };
             // Raised when an impression is recorded for an ad.
@@ -108,7 +110,7 @@ namespace ThirdParty.ServiceImplementation.AdsService.Admob.InterstitialsAds
                 Debug.Log("Interstitial ad full screen content closed.");
             };
             // Raised when the ad failed to open full screen content.
-            ad.OnAdFullScreenContentFailed += (AdError error) =>
+            ad.OnAdFullScreenContentFailed += error =>
             {
                 Debug.LogError("Interstitial ad failed to open full screen content with error : "
                     + error);

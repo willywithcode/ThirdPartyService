@@ -9,6 +9,9 @@ namespace ThirdParty.ServiceImplementation.AdsService.DI
     #if Admob
     using ThirdParty.ServiceImplementation.AdsService.Admob.DI;
     #endif
+    #if IronSource
+    using ThirdParty.ServiceImplementation.AdsService.IronSource.DI;
+    #endif
 
     public static class AdsVContainer
     {
@@ -20,6 +23,9 @@ namespace ThirdParty.ServiceImplementation.AdsService.DI
             #endif
             #if Admob
             builder.RegisterAdmobAds();
+            #endif
+            #if IronSource
+            builder.RegisterIronSourceAds();
             #endif
         }
     }
