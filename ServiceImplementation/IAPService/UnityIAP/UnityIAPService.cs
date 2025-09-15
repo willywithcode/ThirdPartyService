@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
 {
+    #if UNITY_PURCHASING
     using System;
     using System.Collections.Generic;
     using ThirdPartyService.Core.IAPService;
@@ -333,4 +334,5 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             return isValidReceipt;
         }
     }
+    #endif
 }
