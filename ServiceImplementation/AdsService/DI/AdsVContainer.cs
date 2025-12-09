@@ -17,9 +17,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
     {
         public static void RegisterAds(this IContainerBuilder builder)
         {
-            #if UNITY_EDITOR
+            builder.Register<AdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            // #if UNITY_EDITOR
             builder.RegisterDummyAds();
-            #else
+            // #else
             #if MAX
             builder.RegisterAPPLOVINAds();
             #endif
@@ -29,7 +30,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             #if IronSource
             builder.RegisterIronSourceAds();
             #endif
-            #endif
+            // #endif
         }
     }
 }
