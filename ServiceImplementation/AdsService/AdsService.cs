@@ -53,9 +53,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
 
         public void RemoveAds()
         {
-            this.signalBus.Fire<OnRemoveAdsPurchasedSignal>(new());
             this.adsLocalDataService.RemoveAds();
             this.HideBannerAd();
+            this.signalBus.Fire<OnRemoveAdsPurchasedSignal>(new());
         }
 
         public bool IsRemovedAds() => this.adsLocalDataService.IsRemovedAds();
