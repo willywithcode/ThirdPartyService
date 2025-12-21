@@ -2,6 +2,7 @@ namespace ThirdPartyService.ServiceImplementation.DI
 {
     using ThirdPartyService.ServiceImplementation.AdsService.DI;
     using ThirdPartyService.ServiceImplementation.IAPService.DI;
+    using ThirdPartyService.ServiceImplementation.RemoteConfig.DI;
     using VContainer;
 
     public static class ThirdPartyVContainer
@@ -10,6 +11,7 @@ namespace ThirdPartyService.ServiceImplementation.DI
         {
             builder.RegisterAds();
             builder.RegisterIAP();
+            builder.RegisterRemoteConfig();
         }
     }
 }

@@ -3,28 +3,39 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
 {
     using System;
     using Cysharp.Threading.Tasks;
-    using GameFoundation.Scripts.Addressable;
-    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using ThirdPartyService.Core.AdsService.InterstitialsAds;
+    using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using UnityEngine.Events;
 
     public class MAXInterstitialsAdsService : IInterstitialAdsService
     {
         #region Inject
 
-        public MAXInterstitialsAdsService(IAssetsManager assetsManager)
+        private readonly APPLOVINBlueprintService applovinBlueprintService;
+        private readonly SignalBus                signalBus;
+
+        public MAXInterstitialsAdsService(
+            APPLOVINBlueprintService applovinBlueprintService,
+            SignalBus                signalBus
+        )
         {
-            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").interstitialAdUnitId;
+            this.applovinBlueprintService = applovinBlueprintService;
+            this.signalBus                = signalBus;
         }
 
         #endregion
 
-        private          int         retryAttempt;
-        private          UnityAction onAdClosed;
-        private          UnityAction onAdFailedToShow;
-        private readonly string      adUnitId;
-        private          bool        isInitialized;
+        private int         retryAttempt;
+        private UnityAction onAdClosed;
+        private UnityAction onAdFailedToShow;
+        private bool        isInitialized;
 
+        public int GetPriority()
+        {
+            return this.applovinBlueprintService.GetBlueprint().priorityInterstitialsAds;
+        }
         public void Initialize()
         {
             MaxSdkCallbacks.Interstitial.OnAdLoadedEvent        += this.OnAdLoadedEvent;
@@ -37,6 +48,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
             this.Load();
             this.isInitialized = true;
         }
+        private readonly string AD_FLATFORM = "MAX";
 
         public bool IsInitialized()
         {
@@ -49,9 +61,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
             this.onAdFailedToShow = onAdFailedToShow;
             if (this.IsInterstitialReady())
             {
-                MaxSdk.ShowInterstitial(this.adUnitId, where);
-            }
-            else
+                MaxSdk.ShowInterstitial(this.applovinBlueprintService.GetBlueprint().interstitialAdUnitId, where);
+                this.signalBus.Fire<OnInterstitialShowSignal>(new(this.AD_FLATFORM, where));
+            } else
             {
                 this.onAdFailedToShow?.Invoke();
                 this.onAdFailedToShow = null;
@@ -61,18 +73,19 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
 
         public bool IsInterstitialReady()
         {
-            return MaxSdk.IsInterstitialReady(this.adUnitId);
+            return MaxSdk.IsInterstitialReady(this.applovinBlueprintService.GetBlueprint().interstitialAdUnitId);
         }
 
         #region Callbacks
 
         private void Load()
         {
-            MaxSdk.LoadInterstitial(this.adUnitId);
+            MaxSdk.LoadInterstitial(this.applovinBlueprintService.GetBlueprint().interstitialAdUnitId);
         }
 
         private void OnAdRevenuePaidEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
         }
 
         private void OnAdHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
@@ -80,22 +93,26 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
             this.onAdClosed?.Invoke();
             this.onAdClosed = null;
             this.Load();
+            this.signalBus.Fire<OnInterstitialAdHiddenEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnInterstitialAdClickedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
-        private void OnAdDisplayFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo, MaxSdkBase.AdInfo arg3)
+        private void OnAdDisplayFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo error, MaxSdkBase.AdInfo adInfo)
         {
             // Interstitial ad failed to display. We recommend loading the next ad
             this.Load();
             this.onAdFailedToShow?.Invoke();
             this.onAdFailedToShow = null;
+            this.signalBus.Fire<OnInterstitialAdDisplayFailedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, error.Message));
         }
 
         private void OnAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo)
@@ -105,11 +122,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
             this.retryAttempt++;
             var retryDelay = Math.Pow(2, Math.Min(6, this.retryAttempt));
             UniTask.Delay(TimeSpan.FromSeconds(retryDelay)).ContinueWith(this.Load);
+            this.signalBus.Fire<OnInterstitialAdLoadFailedEventSignal>(new(this.AD_FLATFORM, adInfo.Message));
         }
 
         private void OnAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             this.retryAttempt = 0;
+            this.signalBus.Fire<OnInterstitialAdLoadedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         #endregion

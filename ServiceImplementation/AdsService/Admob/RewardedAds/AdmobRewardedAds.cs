@@ -1,23 +1,23 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 {
     #if Admob
-    using GameFoundation.Scripts.Addressable;
     using GoogleMobileAds.Api;
-    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.Core.AdsService.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using UnityEngine.Events;
 
     public class AdmobRewardedAds : IRewardedAdsService
     {
-        private readonly string adUnitId;
+        private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
 
-        public AdmobRewardedAds(IAssetsManager assetsManager)
+        public AdmobRewardedAds(AdmobSettingBlueprintService admobSettingBlueprintService)
         {
-            this.adUnitId = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").rewardedAdUnitId;
+            this.admobSettingBlueprintService = admobSettingBlueprintService;
         }
 
         private RewardedAd rewardedAd;
 
+        public int GetPriority() => this.admobSettingBlueprintService.GetBlueprint().priorityRewarded;
         public void Initialize()
         {
             if (this.rewardedAd != null)
@@ -29,7 +29,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
             var adRequest = new AdRequest();
 
             // Send the request to load the ad.
-            RewardedAd.Load(this.adUnitId, adRequest, (ad, error) =>
+            RewardedAd.Load(this.admobSettingBlueprintService.GetBlueprint().rewardedAdUnitId, adRequest, (ad, error) =>
             {
                 if (error != null)
                     // The ad failed to load.
@@ -42,10 +42,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 
         public void ShowAd(UnityAction<bool> onAdComplete, string where)
         {
-            if (this.rewardedAd != null && this.rewardedAd.CanShowAd())
-                this.rewardedAd.Show((_) => onAdComplete(true));
-            else
-                onAdComplete?.Invoke(false);
+            if (this.rewardedAd != null && this.rewardedAd.CanShowAd()) this.rewardedAd.Show((_) => onAdComplete(true));
+            else onAdComplete?.Invoke(false);
         }
 
         public bool IsAdReady()

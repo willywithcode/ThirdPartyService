@@ -1,5 +1,6 @@
 namespace ThirdPartyService.Core.AdsService.BannerAds {
     public interface IBannerAdsService {
+        public int GetPriority();
         public void  Initialize();
         public void  ShowBanner(BannerPosition position = BannerPosition.BottomCenter);
         public void  HideBanner();

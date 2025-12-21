@@ -1,5 +1,6 @@
 namespace ThirdPartyService.Core.AdsService.MRECAds {
     public interface IMRECAdsService {
+        public int GetPriority();
         public void Initialize();
         public void ShowMREC(MRECAdsPosition position);
         public void HideMREC();

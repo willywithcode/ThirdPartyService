@@ -9,27 +9,26 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
 
     public class AdmobBannerAds : IBannerAdsService
     {
-        private readonly string adUnitId;
-        private readonly bool   isCollapseBanner;
+        private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
 
-        public AdmobBannerAds(IAssetsManager assetsManager)
+        public AdmobBannerAds(AdmobSettingBlueprintService admobSettingBlueprintService )
         {
-            this.adUnitId         = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").bannerAdUnitId;
-            this.isCollapseBanner = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").isCollapseBanner;
+            this.admobSettingBlueprintService = admobSettingBlueprintService;
         }
 
         private BannerView bannerView;
 
+        public int GetPriority() => this.admobSettingBlueprintService.GetBlueprint().priorityBanner;
         public void Initialize()
         {
             // Create a 320x50 banner at top of the screen.
             if (this.bannerView != null) this.bannerView.Destroy();
 
             var adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
-            this.bannerView = new(this.adUnitId, adaptiveSize, AdPosition.Bottom);
+            this.bannerView = new(this.admobSettingBlueprintService.GetBlueprint().bannerAdUnitId, adaptiveSize, AdPosition.Bottom);
             // Send a request to load an ad into the banner view.
             var adRequest = new AdRequest();
-            if (this.isCollapseBanner) adRequest.Extras.Add("collapsible", "bottom");
+            if (this.admobSettingBlueprintService.GetBlueprint().isCollapseBanner) adRequest.Extras.Add("collapsible", "bottom");
             this.bannerView.LoadAd(adRequest);
             this.bannerView.OnBannerAdLoaded += () =>
             {

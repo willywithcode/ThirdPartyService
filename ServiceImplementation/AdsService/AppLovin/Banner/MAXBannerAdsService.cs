@@ -9,20 +9,22 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
 
     public class MAXBannerAdsService : IBannerAdsService
     {
-        private readonly string adUnitId;
+        private readonly APPLOVINBlueprintService applovinBlueprintService;
 
-        public MAXBannerAdsService(IAssetsManager assetsManager)
+        public MAXBannerAdsService(APPLOVINBlueprintService applovinBlueprintService )
         {
-            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").bannerAdUnitId;
+            this.applovinBlueprintService = applovinBlueprintService;
         }
 
         private bool isShown;
 
+        public int GetPriority() => this.applovinBlueprintService.GetBlueprint().priorityBannerAds;
         public void Initialize()
         {
-            var adViewConfiguration = new MaxSdkBase.AdViewConfiguration(MaxSdkBase.AdViewPosition.Centered);
+            var adViewConfiguration = new MaxSdkBase.AdViewConfiguration(ConvertPosition(this.applovinBlueprintService.GetBlueprint().bannerPosition));
+            MaxSdk.CreateBanner(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId, adViewConfiguration);
 
-            MaxSdk.SetBannerBackgroundColor(this.adUnitId, Color.white);
+            MaxSdk.SetBannerBackgroundColor(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId, Color.white);
 
             MaxSdkCallbacks.Banner.OnAdLoadedEvent      += this.OnBannerAdLoadedEvent;
             MaxSdkCallbacks.Banner.OnAdLoadFailedEvent  += this.OnBannerAdLoadFailedEvent;
@@ -35,20 +37,22 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
         public void ShowBanner(BannerPosition bannerPosition = BannerPosition.BottomCenter)
         {
             var adViewPosition = this.ConvertPosition(bannerPosition);
-            MaxSdk.UpdateBannerPosition(this.adUnitId, adViewPosition);
-            MaxSdk.ShowBanner(this.adUnitId);
+            MaxSdk.UpdateBannerPosition(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId, adViewPosition);
+            MaxSdk.ShowBanner(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId);
             this.isShown = true;
         }
 
         public void HideBanner()
         {
-            MaxSdk.HideBanner(this.adUnitId);
+            MaxSdk.HideBanner(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId);
             this.isShown = false;
         }
 
         public float GetBannerHeight()
         {
-            throw new NotImplementedException();
+            var   bannerHeight        = MaxSdk.GetBannerLayout(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId).height;
+            float bannerHeightInUnits = bannerHeight / Screen.dpi * 160f;
+            return bannerHeightInUnits;
         }
 
         public bool IsInitialized()

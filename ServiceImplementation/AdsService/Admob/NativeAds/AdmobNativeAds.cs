@@ -9,15 +9,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds
 
     public class AdmobNativeAds : INativeAdsService
     {
-        private readonly string adUnitId;
+        private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
 
-        public AdmobNativeAds(IAssetsManager assetsManager)
+        public AdmobNativeAds(AdmobSettingBlueprintService admobSettingBlueprintService )
         {
-            this.adUnitId = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").nativeAdUnitId;
+            this.admobSettingBlueprintService = admobSettingBlueprintService;
         }
 
         private NativeOverlayAd nativeOverlayAd;
 
+        public int GetPriority() => this.admobSettingBlueprintService.GetBlueprint().priorityNative;
         public void Initialize()
         {
             // Clean up the old ad before loading a new one.
@@ -40,7 +41,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds
             };
 
             // Send the request to load the ad.
-            NativeOverlayAd.Load(this.adUnitId, adRequest, options,
+            NativeOverlayAd.Load(this.admobSettingBlueprintService.GetBlueprint().nativeAdUnitId, adRequest, options,
                 (ad, error) =>
                 {
                     if (error != null)

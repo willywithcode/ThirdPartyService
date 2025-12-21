@@ -13,6 +13,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
     using ThirdPartyService.Core.AdsService.Signals;
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds;
     using ThirdPartyService.ServiceImplementation.AdsService.LocalDatas;
+    using UnityEngine.Events;
     using ZLinq;
 
     public class AdsService : IAdsService
@@ -59,23 +60,115 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
         }
 
         public bool IsRemovedAds() => this.adsLocalDataService.IsRemovedAds();
+        #region Banner Ads
+
+        private IBannerAdsService currentBannerAdsService;
+        private bool              isShowingBannerAd = false;
         public void ShowBannerAd()
         {
             if (this.IsRemovedAds()) return;
-            this.bannerAdsServices.AsValueEnumerable().FirstOrDefault(banner => banner is DummyBannerAds)?.ShowBanner();
+            var banner = this.bannerAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(b => b.GetPriority())
+                .FirstOrDefault();
+            if (banner is { })
+            {
+                banner.ShowBanner();
+                this.currentBannerAdsService = banner;
+                this.isShowingBannerAd       = true;
+            }
             this.signalBus.Fire<OnShowBannerSignal>(new());
         }
         public void HideBannerAd()
         {
-            this.bannerAdsServices.ForEach(banner => banner.HideBanner());
+            if (this.IsRemovedAds()) return;
+            this.currentBannerAdsService?.HideBanner();
+            this.isShowingBannerAd = false;
             this.signalBus.Fire<OnHideBannerSignal>(new());
         }
         public float GetBannerAdHeight()
         {
             if (this.IsRemovedAds()) return 0f;
-            var banner = this.bannerAdsServices.AsValueEnumerable().FirstOrDefault(b => b.IsShown());
-            return banner is null ? 0f : banner.GetBannerHeight();
+            return this.currentBannerAdsService?.GetBannerHeight() ?? 0f;
+        }
+        public bool IsShowingBannerAd()
+        {
+            if (this.IsRemovedAds()) return false;
+            return this.isShowingBannerAd;
         }
 
+        #endregion
+        #region Interstitial Ads
+
+        public void ShowInterstitialAd(string where, UnityAction onShowFail = null, UnityAction onShowSuccess = null)
+        {
+            if (this.IsRemovedAds())
+            {
+                onShowSuccess?.Invoke();
+                return;
+            }
+            var interstitial = this.interstitialsAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(i => i.GetPriority())
+                .FirstOrDefault();
+            if (interstitial is { })
+            {
+                interstitial.ShowInterstitial(where, onShowFail, onShowSuccess);
+                return;
+            }
+            onShowFail?.Invoke();
+        }
+
+        #endregion
+        #region Rewarded Ads
+
+        public void ShowRewardedAd(UnityAction<bool> onComplete, string where)
+        {
+            var rewarded = this.rewardedAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(r => r.GetPriority())
+                .FirstOrDefault();
+            if (rewarded is { })
+            {
+                rewarded.ShowAd(onComplete, where);
+                return;
+            }
+            onComplete?.Invoke(false);
+        }
+
+        #endregion
+        #region MREC Ads
+
+        private IMRECAdsService currentMRECAdsService;
+        private bool            isShowingMRECAd = false;
+        public void ShowMRECAd(MRECAdsPosition position)
+        {
+            if (this.IsRemovedAds()) return;
+            var mrec = this.mrecAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(m => m.GetPriority())
+                .FirstOrDefault();
+            if (mrec is { })
+            {
+                mrec.ShowMREC(position);
+                this.currentMRECAdsService = mrec;
+                this.isShowingMRECAd       = true;
+            }
+            this.signalBus.Fire<OnShowMRECSignal>(new());
+        }
+        public void HideMRECAd()
+        {
+            if (this.IsRemovedAds()) return;
+            this.currentMRECAdsService?.HideMREC();
+            this.signalBus.Fire<OnHideMRECSignal>(new());
+            this.isShowingMRECAd = false;
+        }
+        public bool IsShowingMRECAd()
+        {
+            if (this.IsRemovedAds()) return false;
+            return this.isShowingMRECAd;
+        }
+
+        #endregion
     }
 }

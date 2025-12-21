@@ -22,7 +22,8 @@
         "Unity.Purchasing.Security",
         "Unity.Purchasing.SecurityCore",
         "Unity.Purchasing.SecurityStub",
-        "UnityEditor.Purchasing"
+        "UnityEditor.Purchasing",
+        "AppsFlyer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

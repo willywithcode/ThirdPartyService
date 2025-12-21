@@ -4,6 +4,7 @@ namespace ThirdPartyService.Core.AdsService.RewardedAds
 
     public interface IRewardedAdsService
     {
+        public int GetPriority();
         public void Initialize();
         public void ShowAd(UnityAction<bool> onAdComplete, string where);
         public bool IsAdReady();

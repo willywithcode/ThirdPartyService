@@ -6,6 +6,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.RewardedAd
 
     public class DummyRewardedAds : IRewardedAdsService
     {
+        public int GetPriority() => 1;
         public void Initialize()
         {
             // Do nothing

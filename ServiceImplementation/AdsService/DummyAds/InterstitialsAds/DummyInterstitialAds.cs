@@ -6,6 +6,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.Interstiti
 
     public class DummyInterstitialAds : IInterstitialAdsService
     {
+        public int GetPriority() => 1;
         public void Initialize()
         {
             // Do nothing

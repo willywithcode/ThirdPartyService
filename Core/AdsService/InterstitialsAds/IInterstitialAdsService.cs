@@ -4,6 +4,7 @@ namespace ThirdPartyService.Core.AdsService.InterstitialsAds
 
     public interface IInterstitialAdsService
     {
+        public int GetPriority();
         public void Initialize();
         public bool IsInitialized();
         public void ShowInterstitial(string where, UnityAction onAdClosed = null, UnityAction onAdFailedToShow = null);

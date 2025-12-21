@@ -8,18 +8,19 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
 
     public class MAXMRECAdsService : IMRECAdsService
     {
-        private readonly string adUnitId;
+        private readonly APPLOVINBlueprintService applovinBlueprintService;
 
-        public MAXMRECAdsService(IAssetsManager assetsManager)
+        public MAXMRECAdsService(APPLOVINBlueprintService applovinBlueprintService )
         {
-            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").mrecAdUnitId;
+            this.applovinBlueprintService = applovinBlueprintService;
         }
 
         private bool isShown;
 
+        public int GetPriority() => this.applovinBlueprintService.GetBlueprint().priorityMRECAds;
         public void Initialize()
         {
-            MaxSdk.CreateMRec(this.adUnitId, MaxSdkBase.AdViewPosition.Centered);
+            MaxSdk.CreateMRec(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId, MaxSdkBase.AdViewPosition.Centered);
 
             MaxSdkCallbacks.MRec.OnAdLoadedEvent      += this.OnMRecAdLoadedEvent;
             MaxSdkCallbacks.MRec.OnAdLoadFailedEvent  += this.OnMRecAdLoadFailedEvent;
@@ -31,14 +32,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
 
         public void ShowMREC(MRECAdsPosition position)
         {
-            MaxSdk.UpdateBannerPosition(this.adUnitId, this.ConvertPosition(position));
-            MaxSdk.ShowBanner(this.adUnitId);
+            MaxSdk.UpdateBannerPosition(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId, this.ConvertPosition(position));
+            MaxSdk.ShowBanner(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId);
             this.isShown = true;
         }
 
         public void HideMREC()
         {
-            MaxSdk.HideBanner(this.adUnitId);
+            MaxSdk.HideBanner(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId);
             this.isShown = false;
         }
 

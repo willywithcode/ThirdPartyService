@@ -12,6 +12,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds
             this.screenManager = screenManager;
 
         }
+        public int GetPriority() => 1;
         public void Initialize() {
         }
 

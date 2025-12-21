@@ -4,6 +4,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.NativeAds
 
     public class DummyNativeAds : INativeAdsService
     {
+        public int GetPriority() => 1;
         public void Initialize()
         {
             //Do nothing

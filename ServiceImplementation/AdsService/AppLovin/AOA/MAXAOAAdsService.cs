@@ -7,13 +7,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
 
     public class MAXAOAAdsService : IAOAAdsService
     {
-        private readonly string adUnitId;
-
-        public MAXAOAAdsService(IAssetsManager assetsManager)
+        private readonly APPLOVINBlueprintService applovinBlueprintService;
+        public MAXAOAAdsService(APPLOVINBlueprintService applovinBlueprintService )
         {
-            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").aoaAdUnitId;
+            this.applovinBlueprintService = applovinBlueprintService;
         }
 
+        public int GetPriority() => this.applovinBlueprintService.GetBlueprint().priorityAoaAds;
         public void Initialize()
         {
             MaxSdkCallbacks.AppOpen.OnAdHiddenEvent    += this.OnAppDissmissedEvent;
@@ -29,16 +29,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
 
         private void OnAppDissmissedEvent(string arg1, MaxSdkBase.AdInfo arg2)
         {
-            MaxSdk.LoadAppOpenAd(this.adUnitId);
+            MaxSdk.LoadAppOpenAd(this.applovinBlueprintService.GetBlueprint().aoaAdUnitId);
             this.isShown = false;
         }
 
         public void ShowAd()
         {
-            if (MaxSdk.IsAppOpenAdReady(this.adUnitId))
-                MaxSdk.ShowAppOpenAd(this.adUnitId);
+            if (MaxSdk.IsAppOpenAdReady(this.applovinBlueprintService.GetBlueprint().aoaAdUnitId))
+                MaxSdk.ShowAppOpenAd(this.applovinBlueprintService.GetBlueprint().aoaAdUnitId);
             else
-                MaxSdk.LoadAppOpenAd(this.adUnitId);
+                MaxSdk.LoadAppOpenAd(this.applovinBlueprintService.GetBlueprint().aoaAdUnitId);
         }
 
         public void HideAd() {
@@ -51,7 +51,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.AOA
 
         public bool IsReady()
         {
-            return MaxSdk.IsAppOpenAdReady(this.adUnitId);
+            return MaxSdk.IsAppOpenAdReady(this.applovinBlueprintService.GetBlueprint().aoaAdUnitId);
         }
     }
 }

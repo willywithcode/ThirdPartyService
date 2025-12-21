@@ -10,18 +10,19 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 
     public class MAXRewardedAdsService : IRewardedAdsService
     {
-        public MAXRewardedAdsService(IAssetsManager assetsManager)
+        private readonly APPLOVINBlueprintService applovinBlueprintService;
+        public MAXRewardedAdsService(APPLOVINBlueprintService applovinBlueprintService )
         {
-            this.adUnitId = assetsManager.LoadAsset<APPLOVINSetting>("APPLOVINSetting").rewardedAdUnitId;
+            this.applovinBlueprintService = applovinBlueprintService;
         }
 
-        private readonly string            adUnitId;
         private          int               retryAttempt;
         private          UnityAction<bool> onAdComplete;
         private          int               countReloadVideo;
         private readonly int[]             maxDelay      = { 2, 4, 8 };
         private          bool              isReloadingAd = false;
 
+        public int GetPriority() => this.applovinBlueprintService.GetBlueprint().priorityRewardedAds;
         public void Initialize()
         {
             MaxSdkCallbacks.Rewarded.OnAdLoadedEvent         += this.OnAdLoadedEvent;
@@ -42,7 +43,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
             {
                 this.countReloadVideo = 0;
                 this.onAdComplete     = onAdComplete;
-                MaxSdk.ShowRewardedAd(this.adUnitId, where);
+                MaxSdk.ShowRewardedAd(this.applovinBlueprintService.GetBlueprint().rewardedAdUnitId, where);
                 return;
             }
             onAdComplete?.Invoke(false);
@@ -50,7 +51,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 
         public bool IsAdReady()
         {
-            if (MaxSdk.IsRewardedAdReady(this.adUnitId)) return true;
+            if (MaxSdk.IsRewardedAdReady(this.applovinBlueprintService.GetBlueprint().rewardedAdUnitId)) return true;
             if (this.countReloadVideo < 3 && !this.isReloadingAd)
             {
                 this.LoadRewardedAd();
@@ -66,7 +67,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 
         private void LoadRewardedAd()
         {
-            MaxSdk.LoadRewardedAd(this.adUnitId);
+            MaxSdk.LoadRewardedAd(this.applovinBlueprintService.GetBlueprint().rewardedAdUnitId);
         }
 
         #region Callbacks

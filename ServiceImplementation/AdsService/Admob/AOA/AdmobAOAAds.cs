@@ -11,11 +11,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
 
     public class AdmobAOAAds : IAOAAdsService
     {
-        private readonly string adUnitId;
+        private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
 
-        public AdmobAOAAds(IAssetsManager assetsManager)
+        public AdmobAOAAds(AdmobSettingBlueprintService admobSettingBlueprintService)
         {
-            this.adUnitId = assetsManager.LoadAsset<AdmobSetting>("AdmobSetting").aoaAdUnitId;
+            this.admobSettingBlueprintService = admobSettingBlueprintService;
         }
 
         private readonly TimeSpan  TIMEOUT = TimeSpan.FromHours(4);
@@ -23,6 +23,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
         private          AppOpenAd appOpenAd;
         private          bool      isShown;
 
+        public int GetPriority() => this.admobSettingBlueprintService.GetBlueprint().priorityAOA;
         public void Initialize()
         {
             this.HideAd();
@@ -74,7 +75,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
             Debug.Log("Loading app open ad.");
             var adRequest = new AdRequest();
 
-            AppOpenAd.Load(this.adUnitId, adRequest, (ad, error) =>
+            AppOpenAd.Load(this.admobSettingBlueprintService.GetBlueprint().aoaAdUnitId, adRequest, (ad, error) =>
             {
                 // If the operation failed with a reason.
                 if (error != null)

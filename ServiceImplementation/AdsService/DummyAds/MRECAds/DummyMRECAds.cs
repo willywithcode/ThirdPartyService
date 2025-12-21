@@ -5,6 +5,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.MRECAds
 
     public class DummyMRECAds : IMRECAdsService
     {
+        public int GetPriority() => 1;
         public void Initialize()
         {
             // Do nothing
