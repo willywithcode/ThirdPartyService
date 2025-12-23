@@ -1,3 +1,5 @@
+using ThirdPartyService.ServiceImplementation.Analytics.DI;
+
 namespace ThirdPartyService.ServiceImplementation.DI
 {
     using ThirdPartyService.ServiceImplementation.AdsService.DI;
@@ -12,6 +14,7 @@ namespace ThirdPartyService.ServiceImplementation.DI
             builder.RegisterAds();
             builder.RegisterIAP();
             builder.RegisterRemoteConfig();
+            builder.RegisterAnalytics();
         }
     }
 }
