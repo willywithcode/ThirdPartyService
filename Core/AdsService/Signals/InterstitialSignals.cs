@@ -19,9 +19,11 @@ namespace ThirdPartyService.Core.AdsService.Signals
     public class OnInterstitialAdDisplayedEventSignal : BaseAdsSignal
     {
         public string PlacementId { get; set; }
-        public OnInterstitialAdDisplayedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdId        { get; set; }
+        public OnInterstitialAdDisplayedEventSignal(string adsPlatform, string placementId, string adId) : base(adsPlatform)
         {
             this.PlacementId = placementId;
+            this.AdId        = adId;
         }
     }
     public class OnInterstitialAdDisplayFailedEventSignal : BaseAdsSignal
@@ -55,11 +57,13 @@ namespace ThirdPartyService.Core.AdsService.Signals
         public string PlacementId { get; set; }
         public double Revenue     { get; set; }
         public string Currency    { get; set; }
-        public OnInterstitialAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency) : base(adsPlatform)
+        public string AdId        { get; set; }
+        public OnInterstitialAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency, string adId) : base(adsPlatform)
         {
             this.PlacementId = placementId;
             this.Revenue     = revenue;
             this.Currency    = currency;
+            this.AdId        = adId;
         }
     }
     public class OnInterstitialShowSignal : BaseAdsSignal

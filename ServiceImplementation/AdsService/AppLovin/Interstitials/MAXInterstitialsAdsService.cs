@@ -85,7 +85,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
 
         private void OnAdRevenuePaidEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
+            this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision, adUnitId));
         }
 
         private void OnAdHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
@@ -112,7 +112,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Interstiti
 
         private void OnAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
+            this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.AdUnitIdentifier));
         }
 
         private void OnAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo)

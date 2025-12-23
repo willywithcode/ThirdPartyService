@@ -5,14 +5,14 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Firebase
     using global::Firebase;
     using ThirdPartyService.Core.RemoteConfig;
     using UnityEngine;
+    using VContainer.Unity;
     using RemoteConfig = global::Firebase.RemoteConfig.FirebaseRemoteConfig;
 
-    public class FirebaseRemoteConfig : IRemoteConfig
+    public class FirebaseRemoteConfig : IRemoteConfig , IInitializable
     {
         private bool         isReady;
         private RemoteConfig remoteConfig;
-
-        public FirebaseRemoteConfig()
+        public void Initialize()
         {
             this.InitializeAsync();
         }

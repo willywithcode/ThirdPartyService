@@ -4,16 +4,24 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
     using System;
     using Cysharp.Threading.Tasks;
     using GameFoundation.Scripts.Addressable;
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using ThirdPartyService.Core.AdsService.RewardedAds;
+    using ThirdPartyService.Core.AdsService.Signals;
     using UnityEngine.Events;
 
     public class MAXRewardedAdsService : IRewardedAdsService
     {
         private readonly APPLOVINBlueprintService applovinBlueprintService;
-        public MAXRewardedAdsService(APPLOVINBlueprintService applovinBlueprintService )
+        private readonly SignalBus                signalBus;
+
+        public MAXRewardedAdsService(
+            APPLOVINBlueprintService applovinBlueprintService,
+            SignalBus                signalBus
+        )
         {
             this.applovinBlueprintService = applovinBlueprintService;
+            this.signalBus                = signalBus;
         }
 
         private          int               retryAttempt;
@@ -21,6 +29,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
         private          int               countReloadVideo;
         private readonly int[]             maxDelay      = { 2, 4, 8 };
         private          bool              isReloadingAd = false;
+        private readonly string            AD_FLATFORM   = "MAX";
 
         public int GetPriority() => this.applovinBlueprintService.GetBlueprint().priorityRewardedAds;
         public void Initialize()
@@ -44,6 +53,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
                 this.countReloadVideo = 0;
                 this.onAdComplete     = onAdComplete;
                 MaxSdk.ShowRewardedAd(this.applovinBlueprintService.GetBlueprint().rewardedAdUnitId, where);
+                this.signalBus.Fire<OnRewardedShowSignal>(new(this.AD_FLATFORM, where));
                 return;
             }
             onAdComplete?.Invoke(false);
@@ -74,12 +84,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
 
         private void OnAdRevenuePaidEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnRewardedAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
         }
 
         private void OnAdReceivedRewardEvent(string adUnitId, MaxSdkBase.Reward adRewardInfo, MaxSdkBase.AdInfo adInfo)
         {
             this.onAdComplete?.Invoke(true);
             this.onAdComplete = null;
+            this.signalBus.Fire<OnRewardedAdReceivedRewardEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adRewardInfo.Label, adRewardInfo.Amount));
         }
 
         private void OnAdDisplayFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adErrorInfo, MaxSdkBase.AdInfo adInfo)
@@ -87,6 +99,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
             this.onAdComplete?.Invoke(false);
             this.onAdComplete = null;
             this.LoadRewardedAd();
+            this.signalBus.Fire<OnRewardedAdDisplayFailedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adErrorInfo.Message));
         }
 
         private void OnAdHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
@@ -94,14 +107,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
             this.onAdComplete?.Invoke(false);
             this.onAdComplete = null;
             this.LoadRewardedAd();
+            this.signalBus.Fire<OnRewardedAdHiddenEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnRewardedAdClickedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
+            this.signalBus.Fire<OnRewardedAdDisplayedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adErrorInfo)
@@ -109,11 +125,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Rewarded
             this.retryAttempt++;
             var retryDelay = Math.Pow(2, Math.Min(6, this.retryAttempt));
             UniTask.Delay(TimeSpan.FromSeconds(retryDelay)).ContinueWith(this.LoadRewardedAd);
+            this.signalBus.Fire<OnRewardedAdLoadFailedEventSignal>(new(this.AD_FLATFORM, adErrorInfo.Message));
         }
 
         private void OnAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             this.retryAttempt = 0;
+            this.signalBus.Fire<OnRewardedAdLoadedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         #endregion

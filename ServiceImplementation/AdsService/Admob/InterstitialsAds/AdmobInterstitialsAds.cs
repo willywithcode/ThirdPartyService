@@ -99,7 +99,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             // Raised when the ad is estimated to have earned money.
             ad.OnAdPaid += adValue =>
             {
-                this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM,"", adValue.Value, adValue.CurrencyCode));
+                this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM,"", adValue.Value, adValue.CurrencyCode, this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
             };
             // Raised when an impression is recorded for an ad.
             ad.OnAdImpressionRecorded += () =>
@@ -116,7 +116,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             ad.OnAdFullScreenContentOpened += () =>
             {
                 Debug.Log("Interstitial ad full screen content opened.");
-                this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, "", this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
             };
             // Raised when the ad closed full screen content.
             ad.OnAdFullScreenContentClosed += () =>

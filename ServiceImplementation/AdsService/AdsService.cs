@@ -77,14 +77,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
                 this.currentBannerAdsService = banner;
                 this.isShowingBannerAd       = true;
             }
-            this.signalBus.Fire<OnShowBannerSignal>(new());
+            this.signalBus.Fire<OnShowBannerSignal>(new("AdsService", ""));
         }
         public void HideBannerAd()
         {
             if (this.IsRemovedAds()) return;
             this.currentBannerAdsService?.HideBanner();
             this.isShowingBannerAd = false;
-            this.signalBus.Fire<OnHideBannerSignal>(new());
+            this.signalBus.Fire<OnHideBannerSignal>(new("AdsService", ""));
         }
         public float GetBannerAdHeight()
         {
@@ -154,13 +154,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
                 this.currentMRECAdsService = mrec;
                 this.isShowingMRECAd       = true;
             }
-            this.signalBus.Fire<OnShowMRECSignal>(new());
+            this.signalBus.Fire<OnShowMRECSignal>(new("AdsService", ""));
         }
         public void HideMRECAd()
         {
             if (this.IsRemovedAds()) return;
             this.currentMRECAdsService?.HideMREC();
-            this.signalBus.Fire<OnHideMRECSignal>(new());
+            this.signalBus.Fire<OnHideMRECSignal>(new("AdsService", ""));
             this.isShowingMRECAd = false;
         }
         public bool IsShowingMRECAd()
