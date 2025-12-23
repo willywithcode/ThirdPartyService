@@ -141,7 +141,8 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             if (!this.IsInitialized)
             {
                 // ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
-
+                Debug.LogWarning("[UnityIAPService] RestorePurchases called but IAP not initialized");
+                onComplete?.Invoke();
                 return;
             }
 
@@ -161,13 +162,17 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
                 {
                     // The first phase of restoration. If no more responses are received on ProcessPurchase then
                     // no purchases are available to be restored.
-
-                    if (!result) return;
+                    if (!result)
+                    {
+                        Debug.LogWarning("[UnityIAPService] Apple restore transactions failed");
+                        onComplete?.Invoke();
+                        return;
+                    }
 
                     foreach (var iapPack in this.iapPacks)
                     {
                         if (!this.IsProductOwned(iapPack.Value.Id)) continue;
-                        // this.signalBus.Fire(new OnRestorePurchaseCompleteSignal(iapPack.Value.Id));
+                        Debug.Log($"[UnityIAPService] Restored product: {iapPack.Value.Id}");
                     }
 
                     onComplete?.Invoke();
@@ -176,7 +181,9 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             // Otherwise ...
             else
             {
-                // We are not running on an Apple device. No work is necessary to restore purchases.
+                // On Android/Google Play, purchases are automatically restored when IAP initializes.
+                // Just invoke the callback immediately.
+                onComplete?.Invoke();
             }
         }
 
@@ -223,6 +230,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
         {
             this.mStoreController        = controller;
             this.mStoreExtensionProvider = extensions;
+            this.isInitialized           = true;
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)
