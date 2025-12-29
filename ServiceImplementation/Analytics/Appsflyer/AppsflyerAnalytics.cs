@@ -3,7 +3,8 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
     using System.Collections.Generic;
     using AppsFlyerSDK;
     using ThirdPartyService.Core.Analytics;
-    public class AppsflyerAnalytics : IAnalyticsService
+    using VContainer.Unity;
+    public class AppsflyerAnalytics : IAnalyticsService , IInitializable
     {
 
         public void SendEvent(string eventName, Dictionary<string, string> eventParams)
@@ -21,6 +22,10 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
             };
             var logRevenue = new AFAdRevenueData("monetizationNetworkEx", mediationNetwork, currency, revenue);
             AppsFlyer.logAdRevenue(logRevenue, additionalParams);
+        }
+        public void Initialize()
+        {
+            AppsFlyer.startSDK();
         }
     }
 }
