@@ -3,10 +3,16 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
     using System.Collections.Generic;
     using AppsFlyerSDK;
     using ThirdPartyService.Core.Analytics;
+    using ThirdPartyService.ServiceImplementation.Analytics.Appsflyer.Blueprints;
     using VContainer.Unity;
     public class AppsflyerAnalytics : IAnalyticsService , IInitializable
     {
+        private readonly AppsflyerBlueprintService appsflyerBlueprintService;
 
+        public AppsflyerAnalytics(AppsflyerBlueprintService appsflyerBlueprintService)
+        {
+            this.appsflyerBlueprintService = appsflyerBlueprintService;
+        }
         public void SendEvent(string eventName, Dictionary<string, string> eventParams)
         {
             AppsFlyer.sendEvent(eventName, eventParams);
@@ -25,7 +31,10 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
         }
         public void Initialize()
         {
+            AppsFlyer.initSDK(this.appsflyerBlueprintService.GetBlueprint().androidDevKey, 
+                              this.appsflyerBlueprintService.GetBlueprint().appId);
             AppsFlyer.startSDK();
+            AppsFlyerAdRevenue.start();
         }
     }
 }

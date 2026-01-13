@@ -110,7 +110,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
             var interstitial = this.interstitialsAdsServices
                 .AsValueEnumerable()
                 .OrderByDescending(i => i.GetPriority())
-                .FirstOrDefault();
+                .FirstOrDefault(i => i.IsInterstitialReady());
             if (interstitial is { })
             {
                 interstitial.ShowInterstitial(where, onShowFail, onShowSuccess);

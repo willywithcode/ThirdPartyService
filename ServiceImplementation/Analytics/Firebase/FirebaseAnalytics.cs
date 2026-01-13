@@ -12,8 +12,8 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
         private bool initFirebase = false;
         public void Initialize()
         {
-            if (Application.platform != RuntimePlatform.WindowsEditor && Application.platform != RuntimePlatform.OSXEditor)
-            {
+            // if (Application.platform != RuntimePlatform.WindowsEditor && Application.platform != RuntimePlatform.OSXEditor)
+            // {
                 Debug.Log("Init firebase load");
                 FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
                 {
@@ -27,7 +27,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
                         Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
                     }
                 });
-            }
+            // }
         }
 
         public void SendEvent(string eventName, Dictionary<string, string> eventParams)
