@@ -8,7 +8,9 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.DI
     {
         public static void RegisterRemoteConfig(this IContainerBuilder builder)
         {
+            #if FIREBASE_REMOTE_CONFIG
             builder.Register<FirebaseRemoteConfig>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            #endif
         }
     }
 }

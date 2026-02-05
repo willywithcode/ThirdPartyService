@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Firebase
 {
+    #if FIREBASE_REMOTE_CONFIG
     using System;
     using System.Threading.Tasks;
     using global::Firebase;
@@ -102,4 +103,5 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Firebase
             }
         }
     }
+#endif
 }

@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
 {
+    #if APPLYER_ANALYTICS
     using System.Collections.Generic;
     using AppsFlyerSDK;
     using ThirdPartyService.Core.Analytics;
@@ -37,4 +38,5 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
             AppsFlyerAdRevenue.start();
         }
     }
+#endif
 }

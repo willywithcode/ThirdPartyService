@@ -1,5 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
 {
+    #if FIREBASE_ANALYTICS
     using System.Collections.Generic;
     using global::Firebase;
     using global::Firebase.Analytics;
@@ -46,4 +47,5 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
             global::Firebase.Analytics.FirebaseAnalytics.LogEvent(eventName, firebaseParams);
         }
     }
+#endif
 }
