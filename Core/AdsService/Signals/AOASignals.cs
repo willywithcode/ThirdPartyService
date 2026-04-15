@@ -1,72 +1,103 @@
 namespace ThirdPartyService.Core.AdsService.Signals
 {
-    public class OnAOAAdLoadedEventSignal : BaseAdsSignal
+    public readonly struct OnAOAAdLoadedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnAOAAdLoadedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnAOAAdLoadedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnAOAAdLoadFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdLoadFailedEventSignal : IAdsSignal
     {
-        public string ErrorMessage { get; set; }
-        public OnAOAAdLoadFailedEventSignal(string adsPlatform, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string ErrorMessage { get; }
+
+        public OnAOAAdLoadFailedEventSignal(string adsPlatform, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnAOAAdDisplayedEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdDisplayedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnAOAAdDisplayedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnAOAAdDisplayedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnAOAAdDisplayFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdDisplayFailedEventSignal : IAdsSignal
     {
-        public string PlacementId  { get; set; }
-        public string ErrorMessage { get; set; }
-        public OnAOAAdDisplayFailedEventSignal(string adsPlatform, string placementId, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string PlacementId  { get; }
+        public string ErrorMessage { get; }
+
+        public OnAOAAdDisplayFailedEventSignal(string adsPlatform, string placementId, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.PlacementId  = placementId;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnAOAAdClickedEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdClickedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnAOAAdClickedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnAOAAdClickedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnAOAAdHiddenEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdHiddenEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnAOAAdHiddenEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnAOAAdHiddenEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnAOAAdRevenuePaidEventSignal : BaseAdsSignal
+
+    public readonly struct OnAOAAdRevenuePaidEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public double Revenue     { get; set; }
-        public string Currency    { get; set; }
-        public OnAOAAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+        public double Revenue     { get; }
+        public string Currency    { get; }
+
+        public OnAOAAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
             this.Revenue     = revenue;
             this.Currency    = currency;
         }
     }
-    public class OnAOAShowSignal : BaseAdsSignal
+
+    public readonly struct OnAOAShowSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnAOAShowSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnAOAShowSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }

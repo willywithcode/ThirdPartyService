@@ -1,8 +1,8 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 {
     #if Admob
-    using GameFoundation.Scripts.Patterns.SignalBus;
     using GoogleMobileAds.Api;
+    using MessagePipe;
     using ThirdPartyService.Core.AdsService.RewardedAds;
     using ThirdPartyService.Core.AdsService.Signals;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
@@ -11,15 +11,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
     public class AdmobRewardedAds : IRewardedAdsService
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
-        private readonly SignalBus                    signalBus;
 
-        public AdmobRewardedAds(
-            AdmobSettingBlueprintService admobSettingBlueprintService,
-            SignalBus                    signalBus
-        )
+        public AdmobRewardedAds(AdmobSettingBlueprintService admobSettingBlueprintService)
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
-            this.signalBus                    = signalBus;
         }
 
         private          RewardedAd rewardedAd;
@@ -42,12 +37,12 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
                 if (error != null)
                 {
                     // The ad failed to load.
-                    this.signalBus.Fire<OnRewardedAdLoadFailedEventSignal>(new(this.AD_FLATFORM, error.GetMessage()));
+                    GlobalMessagePipe.GetPublisher<OnRewardedAdLoadFailedEventSignal>().Publish(new OnRewardedAdLoadFailedEventSignal(this.AD_FLATFORM, error.GetMessage()));
                     return;
                 }
                 // The ad loaded successfully.
                 this.rewardedAd = ad;
-                this.signalBus.Fire<OnRewardedAdLoadedEventSignal>(new(this.AD_FLATFORM, ""));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdLoadedEventSignal>().Publish(new OnRewardedAdLoadedEventSignal(this.AD_FLATFORM, ""));
                 this.RegisterEventHandlers(ad);
             });
         }
@@ -59,9 +54,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
                 this.rewardedAd.Show((reward) =>
                 {
                     onAdComplete(true);
-                    this.signalBus.Fire<OnRewardedAdReceivedRewardEventSignal>(new(this.AD_FLATFORM, "", reward.Type, reward.Amount));
+                    GlobalMessagePipe.GetPublisher<OnRewardedAdReceivedRewardEventSignal>().Publish(new OnRewardedAdReceivedRewardEventSignal(this.AD_FLATFORM, "", reward.Type, reward.Amount));
                 });
-                this.signalBus.Fire<OnRewardedShowSignal>(new(this.AD_FLATFORM, where));
+                GlobalMessagePipe.GetPublisher<OnRewardedShowSignal>().Publish(new OnRewardedShowSignal(this.AD_FLATFORM, where));
             }
             else onAdComplete?.Invoke(false);
         }
@@ -76,7 +71,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
             this.rewardedAd.OnAdPaid += adValue =>
             {
                 // Raised when the ad is estimated to have earned money.
-                this.signalBus.Fire<OnRewardedAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdRevenuePaidEventSignal>().Publish(new OnRewardedAdRevenuePaidEventSignal(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
             };
             this.rewardedAd.OnAdImpressionRecorded += () =>
             {
@@ -85,22 +80,22 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
             this.rewardedAd.OnAdClicked += () =>
             {
                 // Raised when a click is recorded for an ad.
-                this.signalBus.Fire<OnRewardedAdClickedEventSignal>(new(this.AD_FLATFORM, ""));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdClickedEventSignal>().Publish(new OnRewardedAdClickedEventSignal(this.AD_FLATFORM, ""));
             };
             this.rewardedAd.OnAdFullScreenContentOpened += () =>
             {
                 // Raised when the ad opened full screen content.
-                this.signalBus.Fire<OnRewardedAdDisplayedEventSignal>(new(this.AD_FLATFORM, ""));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdDisplayedEventSignal>().Publish(new OnRewardedAdDisplayedEventSignal(this.AD_FLATFORM, ""));
             };
             this.rewardedAd.OnAdFullScreenContentClosed += () =>
             {
-                this.signalBus.Fire<OnRewardedAdHiddenEventSignal>(new(this.AD_FLATFORM, ""));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdHiddenEventSignal>().Publish(new OnRewardedAdHiddenEventSignal(this.AD_FLATFORM, ""));
                 this.Initialize();
             };
             this.rewardedAd.OnAdFullScreenContentFailed += error =>
             {
                 // Raised when the ad failed to open full screen content.
-                this.signalBus.Fire<OnRewardedAdDisplayFailedEventSignal>(new(this.AD_FLATFORM, "", error.GetMessage()));
+                GlobalMessagePipe.GetPublisher<OnRewardedAdDisplayFailedEventSignal>().Publish(new OnRewardedAdDisplayFailedEventSignal(this.AD_FLATFORM, "", error.GetMessage()));
             };
         }
     }

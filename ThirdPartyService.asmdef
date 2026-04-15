@@ -5,6 +5,7 @@
         "GameFoundation.Scripts",
         "GameFoundation.Scripts.DI",
         "VContainer",
+        "MessagePipe",
         "UniTask",
         "UniTask.Linq",
         "Unity.TextMeshPro",

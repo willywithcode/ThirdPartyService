@@ -1,7 +1,7 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService
 {
     using System.Collections.Generic;
-    using GameFoundation.Scripts.Patterns.SignalBus;
+    using MessagePipe;
     using Sirenix.Utilities;
     using ThirdPartyService.Core.AdsService;
     using ThirdPartyService.Core.AdsService.AOA;
@@ -20,34 +20,46 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
     {
         #region Inject
 
-        private readonly AdsLocalDataService                  adsLocalDataService;
-        private readonly IEnumerable<IAOAAdsService>          aoaAdsServices;
-        private readonly IEnumerable<IBannerAdsService>       bannerAdsServices;
-        private readonly IEnumerable<IInterstitialAdsService> interstitialsAdsServices;
-        private readonly IEnumerable<IMRECAdsService>         mrecAdsServices;
-        private readonly IEnumerable<INativeAdsService>       nativeAdsServices;
-        private readonly IEnumerable<IRewardedAdsService>     rewardedAdsServices;
-        private readonly SignalBus                            signalBus;
+        private readonly AdsLocalDataService                     adsLocalDataService;
+        private readonly IEnumerable<IAOAAdsService>             aoaAdsServices;
+        private readonly IEnumerable<IBannerAdsService>          bannerAdsServices;
+        private readonly IEnumerable<IInterstitialAdsService>    interstitialsAdsServices;
+        private readonly IEnumerable<IMRECAdsService>            mrecAdsServices;
+        private readonly IEnumerable<INativeAdsService>          nativeAdsServices;
+        private readonly IEnumerable<IRewardedAdsService>        rewardedAdsServices;
+        private readonly IPublisher<OnRemoveAdsPurchasedSignal>  removeAdsPurchasedPublisher;
+        private readonly IPublisher<OnShowBannerSignal>          showBannerPublisher;
+        private readonly IPublisher<OnHideBannerSignal>          hideBannerPublisher;
+        private readonly IPublisher<OnShowMRECSignal>            showMRECPublisher;
+        private readonly IPublisher<OnHideMRECSignal>            hideMRECPublisher;
 
         public AdsService(
-            AdsLocalDataService                  adsLocalDataService,
-            IEnumerable<IAOAAdsService>          aoaAdsServices,
-            IEnumerable<IBannerAdsService>       bannerAdsServices,
-            IEnumerable<IInterstitialAdsService> interstitialsAdsServices,
-            IEnumerable<IMRECAdsService>         mrecAdsServices,
-            IEnumerable<INativeAdsService>       nativeAdsServices,
-            IEnumerable<IRewardedAdsService>     rewardedAdsServices,
-            SignalBus                            signalBus
+            AdsLocalDataService                     adsLocalDataService,
+            IEnumerable<IAOAAdsService>             aoaAdsServices,
+            IEnumerable<IBannerAdsService>          bannerAdsServices,
+            IEnumerable<IInterstitialAdsService>    interstitialsAdsServices,
+            IEnumerable<IMRECAdsService>            mrecAdsServices,
+            IEnumerable<INativeAdsService>          nativeAdsServices,
+            IEnumerable<IRewardedAdsService>        rewardedAdsServices,
+            IPublisher<OnRemoveAdsPurchasedSignal>  removeAdsPurchasedPublisher,
+            IPublisher<OnShowBannerSignal>          showBannerPublisher,
+            IPublisher<OnHideBannerSignal>          hideBannerPublisher,
+            IPublisher<OnShowMRECSignal>            showMRECPublisher,
+            IPublisher<OnHideMRECSignal>            hideMRECPublisher
         )
         {
-            this.adsLocalDataService      = adsLocalDataService;
-            this.aoaAdsServices           = aoaAdsServices;
-            this.bannerAdsServices        = bannerAdsServices;
-            this.interstitialsAdsServices = interstitialsAdsServices;
-            this.mrecAdsServices          = mrecAdsServices;
-            this.nativeAdsServices        = nativeAdsServices;
-            this.rewardedAdsServices      = rewardedAdsServices;
-            this.signalBus                = signalBus;
+            this.adsLocalDataService         = adsLocalDataService;
+            this.aoaAdsServices              = aoaAdsServices;
+            this.bannerAdsServices           = bannerAdsServices;
+            this.interstitialsAdsServices    = interstitialsAdsServices;
+            this.mrecAdsServices             = mrecAdsServices;
+            this.nativeAdsServices           = nativeAdsServices;
+            this.rewardedAdsServices         = rewardedAdsServices;
+            this.removeAdsPurchasedPublisher = removeAdsPurchasedPublisher;
+            this.showBannerPublisher         = showBannerPublisher;
+            this.hideBannerPublisher         = hideBannerPublisher;
+            this.showMRECPublisher           = showMRECPublisher;
+            this.hideMRECPublisher           = hideMRECPublisher;
         }
 
         #endregion
@@ -56,7 +68,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
         {
             this.adsLocalDataService.RemoveAds();
             this.HideBannerAd();
-            this.signalBus.Fire<OnRemoveAdsPurchasedSignal>(new());
+            this.removeAdsPurchasedPublisher.Publish(new OnRemoveAdsPurchasedSignal());
         }
 
         public bool IsRemovedAds() => this.adsLocalDataService.IsRemovedAds();
@@ -77,14 +89,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
                 this.currentBannerAdsService = banner;
                 this.isShowingBannerAd       = true;
             }
-            this.signalBus.Fire<OnShowBannerSignal>(new("AdsService", ""));
+            this.showBannerPublisher.Publish(new OnShowBannerSignal("AdsService", ""));
         }
         public void HideBannerAd()
         {
             if (this.IsRemovedAds()) return;
             this.currentBannerAdsService?.HideBanner();
             this.isShowingBannerAd = false;
-            this.signalBus.Fire<OnHideBannerSignal>(new("AdsService", ""));
+            this.hideBannerPublisher.Publish(new OnHideBannerSignal("AdsService", ""));
         }
         public float GetBannerAdHeight()
         {
@@ -154,13 +166,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
                 this.currentMRECAdsService = mrec;
                 this.isShowingMRECAd       = true;
             }
-            this.signalBus.Fire<OnShowMRECSignal>(new("AdsService", ""));
+            this.showMRECPublisher.Publish(new OnShowMRECSignal("AdsService", ""));
         }
         public void HideMRECAd()
         {
             if (this.IsRemovedAds()) return;
             this.currentMRECAdsService?.HideMREC();
-            this.signalBus.Fire<OnHideMRECSignal>(new("AdsService", ""));
+            this.hideMRECPublisher.Publish(new OnHideMRECSignal("AdsService", ""));
             this.isShowingMRECAd = false;
         }
         public bool IsShowingMRECAd()
