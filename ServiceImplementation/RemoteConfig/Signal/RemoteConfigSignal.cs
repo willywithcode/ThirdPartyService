@@ -1,7 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Signal
 {
-    public class RemoteConfigSignal
+    public readonly struct RemoteConfigSignal
     {
-        
     }
 }

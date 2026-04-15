@@ -1,70 +1,101 @@
 namespace ThirdPartyService.Core.AdsService.Signals
 {
-    public class OnNativeAdLoadedEventSignal : BaseAdsSignal
+    public readonly struct OnNativeAdLoadedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeAdLoadedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeAdLoadedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnNativeAdLoadFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnNativeAdLoadFailedEventSignal : IAdsSignal
     {
-        public string ErrorMessage { get; set; }
-        public OnNativeAdLoadFailedEventSignal(string adsPlatform, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string ErrorMessage { get; }
+
+        public OnNativeAdLoadFailedEventSignal(string adsPlatform, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnNativeAdDisplayedEventSignal : BaseAdsSignal
+
+    public readonly struct OnNativeAdDisplayedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeAdDisplayedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeAdDisplayedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnNativeAdClickedEventSignal : BaseAdsSignal
+
+    public readonly struct OnNativeAdClickedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeAdClickedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeAdClickedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnNativeAdHiddenEventSignal : BaseAdsSignal
+
+    public readonly struct OnNativeAdHiddenEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeAdHiddenEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeAdHiddenEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnNativeAdRevenuePaidEventSignal : BaseAdsSignal
+
+    public readonly struct OnNativeAdRevenuePaidEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public double Revenue     { get; set; }
-        public string Currency    { get; set; }
-        public OnNativeAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+        public double Revenue     { get; }
+        public string Currency    { get; }
+
+        public OnNativeAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
             this.Revenue     = revenue;
             this.Currency    = currency;
         }
     }
-    public class OnNativeShowSignal : BaseAdsSignal
+
+    public readonly struct OnNativeShowSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeShowSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeShowSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnNativeHideSignal : BaseAdsSignal
+
+    public readonly struct OnNativeHideSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnNativeHideSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnNativeHideSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }

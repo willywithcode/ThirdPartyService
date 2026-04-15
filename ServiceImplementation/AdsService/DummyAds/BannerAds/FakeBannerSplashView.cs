@@ -6,7 +6,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds
     using GameFoundation.Scripts.Patterns.MVP.Implementation;
     using GameFoundation.Scripts.Patterns.MVP.Signals;
     using GameFoundation.Scripts.Patterns.MVP.View;
-    using GameFoundation.Scripts.Patterns.SignalBus;
+    using GameFoundation.Scripts.Signals;
+    using MessagePipe;
     using ThirdPartyService.Core.AdsService.BannerAds;
     using UnityEngine;
 
@@ -33,9 +34,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds
 
         public FakeBannerSplashPresenter(
             IViewFactory viewFactory,
-            SignalBus    signalBus,
-            UICanvas     uiCanvas
-        ) : base(viewFactory, signalBus, uiCanvas) { }
+            UICanvas uiCanvas,
+            IPublisher<OpenPresenterSignal> openPresenterPublisher,
+            IPublisher<HidePresenterSignal> hidePresenterPublisher,
+            IPublisher<OnButtonClickSignal> buttonClickPublisher
+        ) : base(viewFactory, uiCanvas, openPresenterPublisher, hidePresenterPublisher, buttonClickPublisher) { }
         protected override void Bind()
         {
             base.Bind();
@@ -45,7 +48,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.BannerAds
         {
             // base.Close();
             this.OnHide(false);
-            this.signalBus.Fire(new HidePresenterSignal(this));
+            this.hidePresenterPublisher.Publish(new HidePresenterSignal(this));
             this.OnBeforeHide();
             // this.view.Hide();
             this.OnAfterHide();

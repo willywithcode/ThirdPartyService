@@ -3,7 +3,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
 {
     using System;
     using GameFoundation.Scripts.Addressable;
-    using GameFoundation.Scripts.Patterns.SignalBus;
+    using MessagePipe;
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using ThirdPartyService.Core.AdsService.MRECAds;
     using ThirdPartyService.Core.AdsService.Signals;
@@ -11,15 +11,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
     public class MAXMRECAdsService : IMRECAdsService
     {
         private readonly APPLOVINBlueprintService applovinBlueprintService;
-        private readonly SignalBus                signalBus;
 
-        public MAXMRECAdsService(
-            APPLOVINBlueprintService applovinBlueprintService,
-            SignalBus                signalBus
-        )
+        public MAXMRECAdsService(APPLOVINBlueprintService applovinBlueprintService)
         {
             this.applovinBlueprintService = applovinBlueprintService;
-            this.signalBus                = signalBus;
         }
 
         private          bool   isShown;
@@ -43,14 +38,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
             MaxSdk.UpdateBannerPosition(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId, this.ConvertPosition(position));
             MaxSdk.ShowBanner(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId);
             this.isShown = true;
-            this.signalBus.Fire<OnShowMRECSignal>(new(this.AD_FLATFORM, ""));
+            GlobalMessagePipe.GetPublisher<OnShowMRECSignal>().Publish(new OnShowMRECSignal(this.AD_FLATFORM, ""));
         }
 
         public void HideMREC()
         {
             MaxSdk.HideBanner(this.applovinBlueprintService.GetBlueprint().mrecAdUnitId);
             this.isShown = false;
-            this.signalBus.Fire<OnHideMRECSignal>(new(this.AD_FLATFORM, ""));
+            GlobalMessagePipe.GetPublisher<OnHideMRECSignal>().Publish(new OnHideMRECSignal(this.AD_FLATFORM, ""));
         }
 
         public bool IsShown()
@@ -83,27 +78,27 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.MREC
         #region Callbacks
 
         private void OnMRecAdCollapsedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdCollapsedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
+            GlobalMessagePipe.GetPublisher<OnMRECAdCollapsedEventSignal>().Publish(new OnMRECAdCollapsedEventSignal(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnMRecAdExpandedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdExpandedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
+            GlobalMessagePipe.GetPublisher<OnMRECAdExpandedEventSignal>().Publish(new OnMRECAdExpandedEventSignal(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnMRecAdRevenuePaidEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
+            GlobalMessagePipe.GetPublisher<OnMRECAdRevenuePaidEventSignal>().Publish(new OnMRECAdRevenuePaidEventSignal(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
         }
 
         private void OnMRecAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdClickedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
+            GlobalMessagePipe.GetPublisher<OnMRECAdClickedEventSignal>().Publish(new OnMRECAdClickedEventSignal(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnMRecAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdLoadFailedEventSignal>(new(this.AD_FLATFORM, adInfo.Message));
+            GlobalMessagePipe.GetPublisher<OnMRECAdLoadFailedEventSignal>().Publish(new OnMRECAdLoadFailedEventSignal(this.AD_FLATFORM, adInfo.Message));
         }
 
         private void OnMRecAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            this.signalBus.Fire<OnMRECAdLoadedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
+            GlobalMessagePipe.GetPublisher<OnMRECAdLoadedEventSignal>().Publish(new OnMRECAdLoadedEventSignal(this.AD_FLATFORM, adInfo.Placement));
         }
 
         #endregion

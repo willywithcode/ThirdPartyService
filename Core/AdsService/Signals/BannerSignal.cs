@@ -1,70 +1,101 @@
 namespace ThirdPartyService.Core.AdsService.Signals
 {
-    public class OnBannerAdLoadedEventSignal : BaseAdsSignal
+    public readonly struct OnBannerAdLoadedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnBannerAdLoadedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnBannerAdLoadedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnBannerAdLoadFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnBannerAdLoadFailedEventSignal : IAdsSignal
     {
-        public string ErrorMessage { get; set; }
-        public OnBannerAdLoadFailedEventSignal(string adsPlatform, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string ErrorMessage { get; }
+
+        public OnBannerAdLoadFailedEventSignal(string adsPlatform, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnBannerAdClickedEventSignal : BaseAdsSignal
+
+    public readonly struct OnBannerAdClickedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnBannerAdClickedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnBannerAdClickedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnBannerAdRevenuePaidEventSignal : BaseAdsSignal
+
+    public readonly struct OnBannerAdRevenuePaidEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public double Revenue     { get; set; }
-        public string Currency    { get; set; }
-        public OnBannerAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+        public double Revenue     { get; }
+        public string Currency    { get; }
+
+        public OnBannerAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
             this.Revenue     = revenue;
             this.Currency    = currency;
         }
     }
-    public class OnBannerAdExpandedEventSignal : BaseAdsSignal
+
+    public readonly struct OnBannerAdExpandedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnBannerAdExpandedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnBannerAdExpandedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnBannerAdCollapsedEventSignal : BaseAdsSignal
+
+    public readonly struct OnBannerAdCollapsedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnBannerAdCollapsedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnBannerAdCollapsedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnShowBannerSignal : BaseAdsSignal
+
+    public readonly struct OnShowBannerSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnShowBannerSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnShowBannerSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnHideBannerSignal : BaseAdsSignal
+
+    public readonly struct OnHideBannerSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnHideBannerSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnHideBannerSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }

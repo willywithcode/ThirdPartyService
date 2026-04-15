@@ -1,76 +1,107 @@
 namespace ThirdPartyService.Core.AdsService.Signals
 {
-    public class OnInterstitialAdLoadedEventSignal : BaseAdsSignal
+    public readonly struct OnInterstitialAdLoadedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnInterstitialAdLoadedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnInterstitialAdLoadedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnInterstitialAdLoadFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdLoadFailedEventSignal : IAdsSignal
     {
-        public string ErrorMessage { get; set; }
-        public OnInterstitialAdLoadFailedEventSignal(string adsPlatform, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string ErrorMessage { get; }
+
+        public OnInterstitialAdLoadFailedEventSignal(string adsPlatform, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnInterstitialAdDisplayedEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdDisplayedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public string AdId        { get; set; }
-        public OnInterstitialAdDisplayedEventSignal(string adsPlatform, string placementId, string adId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+        public string AdId        { get; }
+
+        public OnInterstitialAdDisplayedEventSignal(string adsPlatform, string placementId, string adId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
             this.AdId        = adId;
         }
     }
-    public class OnInterstitialAdDisplayFailedEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdDisplayFailedEventSignal : IAdsSignal
     {
-        public string PlacementId  { get; set; }
-        public string ErrorMessage { get; set; }
-        public OnInterstitialAdDisplayFailedEventSignal(string adsPlatform, string placementId, string errorMessage) : base(adsPlatform)
+        public string AdsPlatform  { get; }
+        public string PlacementId  { get; }
+        public string ErrorMessage { get; }
+
+        public OnInterstitialAdDisplayFailedEventSignal(string adsPlatform, string placementId, string errorMessage)
         {
+            this.AdsPlatform  = adsPlatform;
             this.PlacementId  = placementId;
             this.ErrorMessage = errorMessage;
         }
     }
-    public class OnInterstitialAdClickedEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdClickedEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnInterstitialAdClickedEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnInterstitialAdClickedEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnInterstitialAdHiddenEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdHiddenEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnInterstitialAdHiddenEventSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnInterstitialAdHiddenEventSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }
-    public class OnInterstitialAdRevenuePaidEventSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialAdRevenuePaidEventSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public double Revenue     { get; set; }
-        public string Currency    { get; set; }
-        public string AdId        { get; set; }
-        public OnInterstitialAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency, string adId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+        public double Revenue     { get; }
+        public string Currency    { get; }
+        public string AdId        { get; }
+
+        public OnInterstitialAdRevenuePaidEventSignal(string adsPlatform, string placementId, double revenue, string currency, string adId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
             this.Revenue     = revenue;
             this.Currency    = currency;
             this.AdId        = adId;
         }
     }
-    public class OnInterstitialShowSignal : BaseAdsSignal
+
+    public readonly struct OnInterstitialShowSignal : IAdsSignal
     {
-        public string PlacementId { get; set; }
-        public OnInterstitialShowSignal(string adsPlatform, string placementId) : base(adsPlatform)
+        public string AdsPlatform { get; }
+        public string PlacementId { get; }
+
+        public OnInterstitialShowSignal(string adsPlatform, string placementId)
         {
+            this.AdsPlatform = adsPlatform;
             this.PlacementId = placementId;
         }
     }

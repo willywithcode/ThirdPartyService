@@ -1,15 +1,11 @@
 namespace ThirdPartyService.Core.AdsService.Signals
 {
-    public class OnRemoveAdsPurchasedSignal
+    public readonly struct OnRemoveAdsPurchasedSignal
     {
-
     }
-    public abstract class BaseAdsSignal
+
+    public interface IAdsSignal
     {
-        public string AdsPlatform { get; set; }
-        protected BaseAdsSignal(string adsPlatform)
-        {
-            this.AdsPlatform = adsPlatform;
-        }
+        string AdsPlatform { get; }
     }
 }
