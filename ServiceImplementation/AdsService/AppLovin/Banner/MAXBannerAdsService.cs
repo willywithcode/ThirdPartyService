@@ -3,7 +3,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
 {
     using System;
     using GameFoundation.Scripts.Addressable;
-    using MessagePipe;
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Blueprints;
     using ThirdPartyService.Core.AdsService.BannerAds;
     using ThirdPartyService.Core.AdsService.Signals;
@@ -12,10 +12,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
     public class MAXBannerAdsService : IBannerAdsService
     {
         private readonly APPLOVINBlueprintService applovinBlueprintService;
+        private readonly SignalBus                signalBus;
 
-        public MAXBannerAdsService(APPLOVINBlueprintService applovinBlueprintService)
+        public MAXBannerAdsService(
+            APPLOVINBlueprintService applovinBlueprintService,
+            SignalBus                signalBus
+        )
         {
             this.applovinBlueprintService = applovinBlueprintService;
+            this.signalBus                = signalBus;
         }
 
         private          bool   isShown;
@@ -43,14 +48,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
             MaxSdk.UpdateBannerPosition(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId, adViewPosition);
             MaxSdk.ShowBanner(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId);
             this.isShown = true;
-            GlobalMessagePipe.GetPublisher<OnShowBannerSignal>().Publish(new OnShowBannerSignal(this.AD_FLATFORM, ""));
+            this.signalBus.Fire<OnShowBannerSignal>(new(this.AD_FLATFORM, ""));
         }
 
         public void HideBanner()
         {
             MaxSdk.HideBanner(this.applovinBlueprintService.GetBlueprint().bannerAdUnitId);
             this.isShown = false;
-            GlobalMessagePipe.GetPublisher<OnHideBannerSignal>().Publish(new OnHideBannerSignal(this.AD_FLATFORM, ""));
+            this.signalBus.Fire<OnHideBannerSignal>(new(this.AD_FLATFORM, ""));
         }
 
         public float GetBannerHeight()
@@ -73,27 +78,27 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.AppLovin.Banner
         #region Callbacks
 
         private void OnBannerAdCollapsedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdCollapsedEventSignal>().Publish(new OnBannerAdCollapsedEventSignal(this.AD_FLATFORM, adInfo.Placement));
+            this.signalBus.Fire<OnBannerAdCollapsedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnBannerAdExpandedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdExpandedEventSignal>().Publish(new OnBannerAdExpandedEventSignal(this.AD_FLATFORM, adInfo.Placement));
+            this.signalBus.Fire<OnBannerAdExpandedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnBannerAdRevenuePaidEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdRevenuePaidEventSignal>().Publish(new OnBannerAdRevenuePaidEventSignal(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
+            this.signalBus.Fire<OnBannerAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, adInfo.Placement, adInfo.Revenue, adInfo.RevenuePrecision));
         }
 
         private void OnBannerAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdClickedEventSignal>().Publish(new OnBannerAdClickedEventSignal(this.AD_FLATFORM, adInfo.Placement));
+            this.signalBus.Fire<OnBannerAdClickedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         private void OnBannerAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdLoadFailedEventSignal>().Publish(new OnBannerAdLoadFailedEventSignal(this.AD_FLATFORM, adInfo.Message));
+            this.signalBus.Fire<OnBannerAdLoadFailedEventSignal>(new(this.AD_FLATFORM, adInfo.Message));
         }
 
         private void OnBannerAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            GlobalMessagePipe.GetPublisher<OnBannerAdLoadedEventSignal>().Publish(new OnBannerAdLoadedEventSignal(this.AD_FLATFORM, adInfo.Placement));
+            this.signalBus.Fire<OnBannerAdLoadedEventSignal>(new(this.AD_FLATFORM, adInfo.Placement));
         }
 
         #endregion

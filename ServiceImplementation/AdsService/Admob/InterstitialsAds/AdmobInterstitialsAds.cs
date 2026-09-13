@@ -1,8 +1,8 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds
 {
     #if Admob
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using GoogleMobileAds.Api;
-    using MessagePipe;
     using ThirdPartyService.Core.AdsService.InterstitialsAds;
     using ThirdPartyService.Core.AdsService.Signals;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
@@ -12,10 +12,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
     public class AdmobInterstitialsAds : IInterstitialAdsService
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
+        private readonly SignalBus                    signalBus;
 
-        public AdmobInterstitialsAds(AdmobSettingBlueprintService admobSettingBlueprintService)
+        public AdmobInterstitialsAds(
+            AdmobSettingBlueprintService admobSettingBlueprintService,
+            SignalBus                    signalBus
+        )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
+            this.signalBus                    = signalBus;
         }
 
         private InterstitialAd interstitialAd;
@@ -46,7 +51,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             if (this.interstitialAd != null && this.interstitialAd.CanShowAd())
             {
                 this.interstitialAd.Show();
-                GlobalMessagePipe.GetPublisher<OnInterstitialShowSignal>().Publish(new OnInterstitialShowSignal(this.AD_FLATFORM, where));
+                this.signalBus.Fire<OnInterstitialShowSignal>(new(this.AD_FLATFORM, where));
             }
             else onAdFailedToShow?.Invoke();
         }
@@ -68,7 +73,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
                 if (error != null)
                 {
                     Debug.LogError("Interstitial ad failed to load an ad with error : " + error);
-                    GlobalMessagePipe.GetPublisher<OnInterstitialAdLoadFailedEventSignal>().Publish(new OnInterstitialAdLoadFailedEventSignal(this.AD_FLATFORM, error.GetMessage()));
+                    this.signalBus.Fire<OnInterstitialAdLoadFailedEventSignal>(new(this.AD_FLATFORM, error.GetMessage()));
                     return;
                 }
                 // If the operation failed for unknown reasons.
@@ -82,7 +87,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
                 // The operation completed successfully.
                 Debug.Log("Interstitial ad loaded with response : " + ad.GetResponseInfo());
                 this.interstitialAd = ad;
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdLoadedEventSignal>().Publish(new OnInterstitialAdLoadedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnInterstitialAdLoadedEventSignal>(new(this.AD_FLATFORM, ""));
 
                 // Register to ad events to extend functionality.
                 this.RegisterEventHandlers(ad);
@@ -94,7 +99,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             // Raised when the ad is estimated to have earned money.
             ad.OnAdPaid += adValue =>
             {
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdRevenuePaidEventSignal>().Publish(new OnInterstitialAdRevenuePaidEventSignal(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode, this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
+                this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(new(this.AD_FLATFORM,"", adValue.Value, adValue.CurrencyCode, this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
             };
             // Raised when an impression is recorded for an ad.
             ad.OnAdImpressionRecorded += () =>
@@ -105,13 +110,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
             ad.OnAdClicked += () =>
             {
                 Debug.Log("Interstitial ad was clicked.");
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdClickedEventSignal>().Publish(new OnInterstitialAdClickedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnInterstitialAdClickedEventSignal>(new(this.AD_FLATFORM, ""));
             };
             // Raised when an ad opened full screen content.
             ad.OnAdFullScreenContentOpened += () =>
             {
                 Debug.Log("Interstitial ad full screen content opened.");
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdDisplayedEventSignal>().Publish(new OnInterstitialAdDisplayedEventSignal(this.AD_FLATFORM, "", this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
+                this.signalBus.Fire<OnInterstitialAdDisplayedEventSignal>(new(this.AD_FLATFORM, "", this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
             };
             // Raised when the ad closed full screen content.
             ad.OnAdFullScreenContentClosed += () =>
@@ -119,14 +124,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
                 this.onSuccess?.Invoke();
                 this.Load();
                 Debug.Log("Interstitial ad full screen content closed.");
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdHiddenEventSignal>().Publish(new OnInterstitialAdHiddenEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnInterstitialAdHiddenEventSignal>(new(this.AD_FLATFORM, ""));
             };
             // Raised when the ad failed to open full screen content.
             ad.OnAdFullScreenContentFailed += error =>
             {
                 Debug.LogError("Interstitial ad failed to open full screen content with error : "
                     + error);
-                GlobalMessagePipe.GetPublisher<OnInterstitialAdDisplayFailedEventSignal>().Publish(new OnInterstitialAdDisplayFailedEventSignal(this.AD_FLATFORM, "", error.GetMessage()));
+                this.signalBus.Fire<OnInterstitialAdDisplayFailedEventSignal>(new(this.AD_FLATFORM, "", error.GetMessage()));
             };
         }
     }
