@@ -3,8 +3,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
     #if Admob
     using System;
     using GameFoundation.Scripts.Addressable;
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using GoogleMobileAds.Api;
-    using MessagePipe;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.Core.AdsService.BannerAds;
     using ThirdPartyService.Core.AdsService.Signals;
@@ -12,10 +12,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
     public class AdmobBannerAds : IBannerAdsService
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
+        private readonly SignalBus                    signalBus;
 
-        public AdmobBannerAds(AdmobSettingBlueprintService admobSettingBlueprintService)
+        public AdmobBannerAds(
+            AdmobSettingBlueprintService admobSettingBlueprintService,
+            SignalBus                    signalBus
+        )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
+            this.signalBus                    = signalBus;
         }
 
         private          BannerView bannerView;
@@ -37,17 +42,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             this.bannerView.OnBannerAdLoaded += () =>
             {
                 // Raised when an ad is loaded into the banner view.
-                GlobalMessagePipe.GetPublisher<OnBannerAdLoadedEventSignal>().Publish(new OnBannerAdLoadedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnBannerAdLoadedEventSignal>(new(this.AD_FLATFORM, ""));
             };
             this.bannerView.OnBannerAdLoadFailed += error =>
             {
                 // Raised when an ad fails to load into the banner view.
-                GlobalMessagePipe.GetPublisher<OnBannerAdLoadFailedEventSignal>().Publish(new OnBannerAdLoadFailedEventSignal(this.AD_FLATFORM, error.GetMessage()));
+                this.signalBus.Fire<OnBannerAdLoadFailedEventSignal>(new(this.AD_FLATFORM, error.GetMessage()));
             };
             this.bannerView.OnAdPaid += adValue =>
             {
                 // Raised when the ad is estimated to have earned money.
-                GlobalMessagePipe.GetPublisher<OnBannerAdRevenuePaidEventSignal>().Publish(new OnBannerAdRevenuePaidEventSignal(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+                this.signalBus.Fire<OnBannerAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
             };
             this.bannerView.OnAdImpressionRecorded += () =>
             {
@@ -56,17 +61,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             this.bannerView.OnAdClicked += () =>
             {
                 // Raised when a click is recorded for an ad.
-                GlobalMessagePipe.GetPublisher<OnBannerAdClickedEventSignal>().Publish(new OnBannerAdClickedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnBannerAdClickedEventSignal>(new(this.AD_FLATFORM, ""));
             };
             this.bannerView.OnAdFullScreenContentOpened += () =>
             {
                 // Raised when an ad opened full screen content.
-                GlobalMessagePipe.GetPublisher<OnBannerAdExpandedEventSignal>().Publish(new OnBannerAdExpandedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnBannerAdExpandedEventSignal>(new(this.AD_FLATFORM, ""));
             };
             this.bannerView.OnAdFullScreenContentClosed += () =>
             {
                 // Raised when the ad closed full screen content.
-                GlobalMessagePipe.GetPublisher<OnBannerAdCollapsedEventSignal>().Publish(new OnBannerAdCollapsedEventSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnBannerAdCollapsedEventSignal>(new(this.AD_FLATFORM, ""));
             };
         }
 
@@ -75,7 +80,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             if (position != BannerPosition.BottomCenter) this.bannerView.SetPosition(this.Convert(position));
             this.bannerView.Show();
             this.isShown = true;
-            GlobalMessagePipe.GetPublisher<OnShowBannerSignal>().Publish(new OnShowBannerSignal(this.AD_FLATFORM, ""));
+            this.signalBus.Fire<OnShowBannerSignal>(new(this.AD_FLATFORM, ""));
         }
 
         public void HideBanner()
@@ -84,7 +89,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             {
                 this.bannerView.Hide();
                 this.isShown = false;
-                GlobalMessagePipe.GetPublisher<OnHideBannerSignal>().Publish(new OnHideBannerSignal(this.AD_FLATFORM, ""));
+                this.signalBus.Fire<OnHideBannerSignal>(new(this.AD_FLATFORM, ""));
             }
         }
 
