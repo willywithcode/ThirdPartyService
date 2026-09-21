@@ -10,7 +10,16 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
     using VContainer.Unity;
     public class FirebaseAnalytics : IAnalyticsService, IInitializable
     {
+        // Resolving dependencies takes several frames, and events fired in the meantime are real:
+        // anything reported at startup would otherwise be dropped every single run. They wait here
+        // and go out once Firebase is up.
+        private const int MAX_PENDING_EVENTS = 64;
+
+        private readonly List<(string EventName, Dictionary<string, string> EventParams)> pendingEvents = new();
+
         private bool initFirebase = false;
+        private bool initFailed   = false;
+
         public void Initialize()
         {
             // if (Application.platform != RuntimePlatform.WindowsEditor && Application.platform != RuntimePlatform.OSXEditor)
@@ -23,8 +32,11 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
                     {
                         this.initFirebase = true;
                         Debug.Log("Init firebase");
+                        this.FlushPendingEvents();
                     } else
                     {
+                        this.initFailed = true;
+                        this.pendingEvents.Clear();
                         Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
                     }
                 });
@@ -35,9 +47,40 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
         {
             if (!this.initFirebase)
             {
-                Debug.LogWarning("Firebase Analytics not initialized.");
+                this.QueueEvent(eventName, eventParams);
                 return;
             }
+
+            LogEvent(eventName, eventParams);
+        }
+
+        // Copied, because callers are free to reuse or mutate the dictionary they handed over once
+        // SendEvent returns, and this one is read later.
+        private void QueueEvent(string eventName, Dictionary<string, string> eventParams)
+        {
+            if (this.initFailed) return;
+
+            if (this.pendingEvents.Count >= MAX_PENDING_EVENTS)
+            {
+                Debug.LogWarning($"Firebase Analytics still initializing; dropping '{eventName}'.");
+                return;
+            }
+
+            this.pendingEvents.Add((eventName, new Dictionary<string, string>(eventParams)));
+        }
+
+        private void FlushPendingEvents()
+        {
+            foreach (var (eventName, eventParams) in this.pendingEvents)
+            {
+                LogEvent(eventName, eventParams);
+            }
+
+            this.pendingEvents.Clear();
+        }
+
+        private static void LogEvent(string eventName, Dictionary<string, string> eventParams)
+        {
             var firebaseParams = new Parameter[eventParams.Count];
             var index          = 0;
             foreach (var param in eventParams)
