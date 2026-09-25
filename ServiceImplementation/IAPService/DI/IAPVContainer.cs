@@ -2,7 +2,7 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DI
 {
     using ThirdPartyService.ServiceImplementation.IAPService.DummyIAP;
     using VContainer;
-    #if UNITY_PURCHASING
+    #if UNITY_PURCHASING || UNITY_PURCHASING_V5
     using ThirdPartyService.ServiceImplementation.UnityIAP.IAPService;
     #endif
 
@@ -12,10 +12,10 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DI
         {
             #if UNITY_EDITOR
             builder.Register<DummyIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
-            #else
-            #if UNITY_PURCHASING
+            #elif UNITY_PURCHASING
             builder.Register<UnityIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
-            #endif
+            #elif UNITY_PURCHASING_V5
+            builder.Register<UnityIAPV5Service>(Lifetime.Singleton).AsImplementedInterfaces();
             #endif
         }
     }
