@@ -22,7 +22,7 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Firebase
         {
             try
             {
-                var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
+                var dependencyStatus = await FirebaseDependencies.CheckAndFixAsync();
                 if (dependencyStatus == DependencyStatus.Available)
                 {
                     this.remoteConfig = RemoteConfig.DefaultInstance;

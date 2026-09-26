@@ -25,7 +25,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
             // if (Application.platform != RuntimePlatform.WindowsEditor && Application.platform != RuntimePlatform.OSXEditor)
             // {
                 Debug.Log("Init firebase load");
-                FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+                FirebaseDependencies.CheckAndFixAsync().ContinueWithOnMainThread(task =>
                 {
                     var dependencyStatus = task.Result;
                     if (dependencyStatus == DependencyStatus.Available)
