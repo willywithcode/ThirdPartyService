@@ -44,6 +44,12 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.purchasing",
+            "expression": "5.0.0",
+            "define": "UNITY_PURCHASING_V5"
+        }
+    ],
     "noEngineReferences": false
 }
