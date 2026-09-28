@@ -12,6 +12,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
     #if IronSource
     using ThirdParty.ServiceImplementation.AdsService.IronSource.DI;
     #endif
+    #if LevelPlay
+    using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.DI;
+    #endif
 
     public static class AdsVContainer
     {
@@ -29,6 +32,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             #endif
             #if IronSource
             builder.RegisterIronSourceAds();
+            #endif
+            #if LevelPlay
+            builder.RegisterLevelPlayAds();
             #endif
             // #endif
         }
