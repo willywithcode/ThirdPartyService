@@ -113,7 +113,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
                 .FirstOrDefault(i => i.IsInterstitialReady());
             if (interstitial is { })
             {
-                interstitial.ShowInterstitial(where, onShowFail, onShowSuccess);
+                interstitial.ShowInterstitial(where, onAdClosed: onShowSuccess, onAdFailedToShow: onShowFail);
                 return;
             }
             onShowFail?.Invoke();
