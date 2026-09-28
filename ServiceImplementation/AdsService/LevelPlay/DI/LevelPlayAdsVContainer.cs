@@ -6,6 +6,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.DI
     #if LevelPlay
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
+    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+    using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Dev;
+    #endif
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.InterstitialsAds;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.MRECAds;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.RewardedAds;
@@ -34,6 +37,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.DI
             builder.Register<LevelPlayRewardedAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
 
             builder.RegisterEntryPoint<Setup>();
+            #if DEVELOPMENT_BUILD || UNITY_EDITOR
+            builder.RegisterEntryPoint<LevelPlayAdsDevPanelInstaller>();
+            #endif
         }
     }
     #endif
