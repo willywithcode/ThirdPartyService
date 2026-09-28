@@ -4,6 +4,11 @@
     "references": [
         "ThirdPartyService",
         "GameFoundation.Scripts",
+        "VContainer",
+        "UniTask",
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "Unity.LevelPlay",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
