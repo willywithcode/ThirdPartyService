@@ -1,6 +1,7 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DI
 {
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.DI;
+    using ThirdPartyService.ServiceImplementation.ConsentService.DI;
     using VContainer;
     #if MAX
     using ThirdPartyService.ServiceImplementation.AdsService.AppLovin.DI;
@@ -20,6 +21,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
     {
         public static void RegisterAds(this IContainerBuilder builder)
         {
+            builder.RegisterConsent();
             builder.Register<AdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             // #if UNITY_EDITOR
             builder.RegisterDummyAds();
