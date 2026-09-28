@@ -5,6 +5,7 @@ namespace ThirdPartyService.Tests.EditMode.Consent
     using Cysharp.Threading.Tasks;
     using NUnit.Framework;
     using ThirdPartyService.ServiceImplementation.ConsentService;
+    using UnityEngine;
 
     public class ConsentServiceTests
     {
@@ -77,6 +78,28 @@ namespace ThirdPartyService.Tests.EditMode.Consent
             bridge.UpdateSuccess();
             Assert.That(service.IsGathered, Is.True);
             Assert.That(bridge.FormCalls, Is.Zero);
+        }
+
+        [Test]
+        public async Task DefaultTimeout_ExpiresWhileTimeScaleIsPaused()
+        {
+            var previousTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            try
+            {
+                var bridge = new Bridge();
+                var service = new ConsentService(bridge, new AppIdProvider());
+                var gathering = service.GatherConsentAsync().AsTask();
+                var finished = await Task.WhenAny(gathering, Task.Delay(TimeSpan.FromSeconds(7)));
+                Assert.That(finished, Is.SameAs(gathering), "The 5 s update cap must use real time when the game is paused.");
+                await gathering;
+                Assert.That(service.IsGathered, Is.True);
+                Assert.That(bridge.FormCalls, Is.Zero);
+            }
+            finally
+            {
+                Time.timeScale = previousTimeScale;
+            }
         }
 
         [Test]

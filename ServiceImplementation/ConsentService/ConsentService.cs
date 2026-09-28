@@ -38,7 +38,7 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService
         private UniTaskCompletionSource gatherCompletion;
 
         public ConsentService(IConsentBridge bridge, IConsentAppIdProvider appId)
-            : this(bridge, appId, () => UniTask.Delay(TimeSpan.FromSeconds(5))) { }
+            : this(bridge, appId, () => UniTask.Delay(TimeSpan.FromSeconds(5), DelayType.Realtime)) { }
 
         // A supplied timer makes timeout behavior deterministic in EditMode.
         public ConsentService(IConsentBridge bridge, IConsentAppIdProvider appId, Func<UniTask> infoUpdateTimeout)
