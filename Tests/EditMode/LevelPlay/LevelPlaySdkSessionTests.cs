@@ -121,7 +121,8 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             var rewarded     = this.rig.NewRewarded();
             var banner       = this.rig.NewBanner();
             var mrec         = this.rig.NewMrec();
-            var setup        = new Setup(this.rig.Session, this.rig.Settings, banner, mrec, interstitial, rewarded);
+            var dummy = new ThirdPartyService.ServiceImplementation.ConsentService.DummyConsentService();
+            var setup = new Setup(this.rig.Session, this.rig.Settings, banner, mrec, interstitial, rewarded, dummy, dummy, this.rig.Sdk, new ThirdPartyService.ServiceImplementation.Analytics.Null.NullAnalyticsService());
 
             setup.Start();
             this.rig.Sdk.SucceedInit();

@@ -4,6 +4,8 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using NUnit.Framework;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Blueprints;
+    using ThirdPartyService.ServiceImplementation.Analytics.Null;
+    using ThirdPartyService.ServiceImplementation.ConsentService;
     using UnityEngine;
 
     // Whether the SDK starts: the Editor and development builds always start it; a release build
@@ -30,7 +32,8 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
         {
             var rig = new AdsTestRig(initialized: false);
             rig.Settings.StartSdkInReleaseBuilds = startSdkInReleaseBuilds;
-            var setup = new Setup(rig.Session, rig.Settings, rig.NewBanner(), rig.NewMrec(), rig.NewInterstitial(), rig.NewRewarded());
+            var dummy = new DummyConsentService();
+            var setup = new Setup(rig.Session, rig.Settings, rig.NewBanner(), rig.NewMrec(), rig.NewInterstitial(), rig.NewRewarded(), dummy, dummy, rig.Sdk, new NullAnalyticsService());
 
             setup.Start();
 

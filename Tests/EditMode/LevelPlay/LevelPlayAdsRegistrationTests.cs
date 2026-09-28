@@ -8,8 +8,11 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using NUnit.Framework;
     using ThirdPartyService.Core.AdsService;
     using ThirdPartyService.Core.AdsService.MRECAds;
+    using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.DI;
+    using ThirdPartyService.ServiceImplementation.Analytics.Null;
+    using ThirdPartyService.ServiceImplementation.ConsentService.DI;
     using UnityEngine;
     using VContainer;
     using VContainer.Unity;
@@ -30,7 +33,9 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             public float GetBannerAdHeight() => 0f;
             public bool  IsShowingBannerAd() => false;
             public void  ShowInterstitialAd(string where, UnityEngine.Events.UnityAction onShowFail = null, UnityEngine.Events.UnityAction onShowSuccess = null) { }
+            public bool  IsInterstitialAdReady() => false;
             public void  ShowRewardedAd(UnityEngine.Events.UnityAction<bool> onComplete, string where) { }
+            public bool  IsRewardedAdReady() => false;
             public void  ShowMRECAd(MRECAdsPosition position) { }
             public void  HideMRECAd() { }
             public bool  IsShowingMRECAd() => false;
@@ -46,6 +51,8 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             builder.RegisterInstance<IAssetsManager>(assets);
             builder.RegisterInstance<IAdsService>(new NullAdsService());
             builder.RegisterSOBlueprint();
+            builder.RegisterConsent();
+            builder.Register<NullAnalyticsService>(Lifetime.Singleton).As<IAdRevenueService>();
             builder.RegisterLevelPlayAds();
 
             try

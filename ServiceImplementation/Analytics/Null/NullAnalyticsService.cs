@@ -8,10 +8,12 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Null
     /// IAnalyticsService without every one of them repeating the provider's #if. A build with the
     /// defines off then drops its events here rather than failing to resolve the dependency.
     /// </summary>
-    public class NullAnalyticsService : IAnalyticsService
+    public class NullAnalyticsService : IAnalyticsService, IAdRevenueService
     {
         public void SendEvent(string eventName, Dictionary<string, string> eventParams)
         {
         }
+
+        public void SendAdImpression(AdImpression impression) { }
     }
 }

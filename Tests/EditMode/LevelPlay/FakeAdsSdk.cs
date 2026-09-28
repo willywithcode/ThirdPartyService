@@ -5,6 +5,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using System.Collections.Generic;
     using System.Linq;
     using ThirdPartyService.Core.AdsService.BannerAds;
+    using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
@@ -17,6 +18,11 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     // callbacks in any order, with no network.
     internal sealed class FakeAdsSdk : IAdsSdk
     {
+        public event Action<AdImpression> ImpressionDataReady;
+        public readonly List<string> PrivacyCalls = new();
+        public void SetCOPPA(bool value) => this.PrivacyCalls.Add($"COPPA:{value}");
+        public void SetCCPA(bool value) => this.PrivacyCalls.Add($"CCPA:{value}");
+        public void EmitImpression(AdImpression impression) => this.ImpressionDataReady?.Invoke(impression);
         private Action         initSuccess;
         private Action<string> initFailed;
 
@@ -27,6 +33,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
 
         public void Init(string appKey, Action onSuccess, Action<string> onFailed)
         {
+            this.PrivacyCalls.Add("Init");
             this.InitAppKeys.Add(appKey);
             this.initSuccess = onSuccess;
             this.initFailed  = onFailed;
