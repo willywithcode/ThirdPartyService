@@ -4,6 +4,7 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService
     using Cysharp.Threading.Tasks;
     using ThirdPartyService.Core.ConsentService;
     using UnityEngine;
+    using VContainer;
 
     // Native calls are isolated so the flow can be exercised without an Android device.
     public interface IConsentBridge
@@ -37,6 +38,9 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService
         private readonly Func<UniTask> infoUpdateTimeout;
         private UniTaskCompletionSource gatherCompletion;
 
+        // VContainer picks the constructor with the most parameters unless one is marked, and the
+        // timer overload has nothing registered for its Func<UniTask>.
+        [Inject]
         public ConsentService(IConsentBridge bridge, IConsentAppIdProvider appId)
             : this(bridge, appId, () => UniTask.Delay(TimeSpan.FromSeconds(5), DelayType.Realtime)) { }
 

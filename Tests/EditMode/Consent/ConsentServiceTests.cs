@@ -4,8 +4,10 @@ namespace ThirdPartyService.Tests.EditMode.Consent
     using System.Threading.Tasks;
     using Cysharp.Threading.Tasks;
     using NUnit.Framework;
+    using ThirdPartyService.Core.ConsentService;
     using ThirdPartyService.ServiceImplementation.ConsentService;
     using UnityEngine;
+    using VContainer;
 
     public class ConsentServiceTests
     {
@@ -33,6 +35,22 @@ namespace ThirdPartyService.Tests.EditMode.Consent
             }
             public void LoadAndShowConsentFormIfRequired(Action complete) { this.FormCalls++; this.FormComplete = complete; }
             public void ShowPrivacyOptionsForm(Action complete) { this.PrivacyCalls++; this.PrivacyComplete = complete; }
+        }
+
+        // The Android registration resolves ConsentService through VContainer. With two public
+        // constructors and none marked, VContainer took the timer overload and failed on device
+        // (No such registration of type Func<UniTask>), which stopped the Loading scene.
+        [Test]
+        public void TheAndroidRegistration_ResolvesThroughVContainer()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance<IConsentAppIdProvider>(new AppIdProvider());
+            builder.RegisterInstance<IConsentBridge>(new Bridge());
+            builder.Register<ConsentService>(Lifetime.Singleton).AsSelf().As<IConsentService>();
+
+            using var container = builder.Build();
+
+            Assert.That(container.Resolve<IConsentService>(), Is.InstanceOf<ConsentService>());
         }
 
         [TestCase(true)]
