@@ -3,6 +3,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk
     #if LevelPlay
     using System;
     using ThirdPartyService.Core.AdsService.BannerAds;
+    using ThirdPartyService.Core.Analytics;
     using global::Unity.Services.LevelPlay;
     using UnityEngine;
     using LevelPlaySdk = global::Unity.Services.LevelPlay.LevelPlay;
@@ -11,6 +12,31 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk
     // com.unity.services.levelplay 9.5.1 C# API and nothing more; all policy lives in the wrappers.
     public class LevelPlaySdkAdapter : IAdsSdk
     {
+        public event Action<AdImpression> ImpressionDataReady
+        {
+            add
+            {
+                if (this.impressionDataReady == null) LevelPlaySdk.OnImpressionDataReady += this.OnImpression;
+                this.impressionDataReady += value;
+            }
+            remove
+            {
+                this.impressionDataReady -= value;
+                if (this.impressionDataReady == null) LevelPlaySdk.OnImpressionDataReady -= this.OnImpression;
+            }
+        }
+
+        private event Action<AdImpression> impressionDataReady;
+
+        private void OnImpression(LevelPlayImpressionData data)
+        {
+            if (data == null) return;
+            this.impressionDataReady?.Invoke(new AdImpression(data.AdNetwork, data.AdFormat, data.MediationAdUnitName, data.Revenue));
+        }
+
+        public void SetCOPPA(bool value) => LevelPlayPrivacySettings.SetCOPPA(value);
+        public void SetCCPA(bool value) => LevelPlayPrivacySettings.SetCCPA(value);
+
         private Action         pendingSuccess;
         private Action<string> pendingFailure;
 

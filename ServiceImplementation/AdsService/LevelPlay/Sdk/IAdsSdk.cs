@@ -2,6 +2,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk
 {
     #if LevelPlay
     using System;
+    using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.Core.AdsService.BannerAds;
 
     // The seam between the LevelPlay ad wrappers and the mediation SDK. Everything the wrappers need
@@ -9,6 +10,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk
     // driven by a fake in EditMode tests and LevelPlay's own types stay inside LevelPlaySdkAdapter.
     public interface IAdsSdk
     {
+        event Action<AdImpression> ImpressionDataReady;
+        void SetCOPPA(bool value);
+        void SetCCPA(bool value);
         // Exactly one of the callbacks fires, once, for each call.
         void Init(string appKey, Action onSuccess, Action<string> onFailed);
 

@@ -11,7 +11,9 @@ namespace ThirdPartyService.Core.AdsService
         public float GetBannerAdHeight();
         public bool  IsShowingBannerAd();
         public void  ShowInterstitialAd(string        where,      UnityAction onShowFail = null, UnityAction onShowSuccess = null);
+        public bool  IsInterstitialAdReady();
         public void  ShowRewardedAd(UnityAction<bool> onComplete, string      where);
+        public bool  IsRewardedAdReady();
         public void  ShowMRECAd(MRECAdsPosition       position);
         public void  HideMRECAd();
         public bool  IsShowingMRECAd();

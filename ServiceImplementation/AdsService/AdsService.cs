@@ -100,6 +100,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
         #endregion
         #region Interstitial Ads
 
+        public bool IsInterstitialAdReady()
+        {
+            if (this.IsRemovedAds()) return false;
+            return this.interstitialsAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(i => i.GetPriority())
+                .FirstOrDefault(i => i.IsInterstitialReady()) is { };
+        }
+
         public void ShowInterstitialAd(string where, UnityAction onShowFail = null, UnityAction onShowSuccess = null)
         {
             if (this.IsRemovedAds())
@@ -121,6 +130,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
 
         #endregion
         #region Rewarded Ads
+
+        public bool IsRewardedAdReady()
+        {
+            var rewarded = this.rewardedAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(r => r.GetPriority())
+                .FirstOrDefault();
+            return rewarded?.IsAdReady() ?? false;
+        }
 
         public void ShowRewardedAd(UnityAction<bool> onComplete, string where)
         {

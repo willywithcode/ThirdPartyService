@@ -8,7 +8,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
     using ThirdPartyService.Core.Analytics;
     using UnityEngine;
     using VContainer.Unity;
-    public class FirebaseAnalytics : IAnalyticsService, IInitializable
+    public class FirebaseAnalytics : IAnalyticsService, IAdRevenueService, IInitializable
     {
         // Resolving dependencies takes several frames, and events fired in the meantime are real:
         // anything reported at startup would otherwise be dropped every single run. They wait here
@@ -16,6 +16,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
         private const int MAX_PENDING_EVENTS = 64;
 
         private readonly List<(string EventName, Dictionary<string, string> EventParams)> pendingEvents = new();
+        private readonly List<AdImpression> pendingImpressions = new();
 
         private bool initFirebase = false;
         private bool initFailed   = false;
@@ -37,6 +38,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
                     {
                         this.initFailed = true;
                         this.pendingEvents.Clear();
+                        this.pendingImpressions.Clear();
                         Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
                     }
                 });
@@ -54,13 +56,36 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
             LogEvent(eventName, eventParams);
         }
 
+        public void SendAdImpression(AdImpression impression)
+        {
+            if (!this.initFirebase)
+            {
+                if (!this.initFailed && this.pendingEvents.Count + this.pendingImpressions.Count < MAX_PENDING_EVENTS)
+                    this.pendingImpressions.Add(impression);
+                return;
+            }
+            LogImpression(impression);
+        }
+
+        public static Parameter[] ToFirebaseParameters(AdImpression impression)
+        {
+            var mapped = AdImpressionFirebaseParameters.Map(impression);
+            var parameters = new List<Parameter>(mapped.Count);
+            foreach (var pair in mapped)
+                parameters.Add(pair.Value is double amount ? new Parameter(pair.Key, amount) : new Parameter(pair.Key, (string)pair.Value));
+            return parameters.ToArray();
+        }
+
+        private static void LogImpression(AdImpression impression) =>
+            global::Firebase.Analytics.FirebaseAnalytics.LogEvent("ad_impression", ToFirebaseParameters(impression));
+
         // Copied, because callers are free to reuse or mutate the dictionary they handed over once
         // SendEvent returns, and this one is read later.
         private void QueueEvent(string eventName, Dictionary<string, string> eventParams)
         {
             if (this.initFailed) return;
 
-            if (this.pendingEvents.Count >= MAX_PENDING_EVENTS)
+            if (this.pendingEvents.Count + this.pendingImpressions.Count >= MAX_PENDING_EVENTS)
             {
                 Debug.LogWarning($"Firebase Analytics still initializing; dropping '{eventName}'.");
                 return;
@@ -77,6 +102,8 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
             }
 
             this.pendingEvents.Clear();
+            foreach (var impression in this.pendingImpressions) LogImpression(impression);
+            this.pendingImpressions.Clear();
         }
 
         private static void LogEvent(string eventName, Dictionary<string, string> eventParams)

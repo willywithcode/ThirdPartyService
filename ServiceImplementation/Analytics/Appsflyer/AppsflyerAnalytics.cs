@@ -6,7 +6,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
     using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.ServiceImplementation.Analytics.Appsflyer.Blueprints;
     using VContainer.Unity;
-    public class AppsflyerAnalytics : IAnalyticsService , IInitializable
+    public class AppsflyerAnalytics : IAnalyticsService, IAdRevenueService, IInitializable
     {
         private readonly AppsflyerBlueprintService appsflyerBlueprintService;
 
@@ -18,6 +18,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
         {
             AppsFlyer.sendEvent(eventName, eventParams);
         }
+        public void SendAdImpression(AdImpression impression) { }
         public void SendAdRevenue(string country, string adUnit, string type, string placement, MediationNetwork mediationNetwork, string currency, double revenue)
         {
             var additionalParams = new Dictionary<string, string>
