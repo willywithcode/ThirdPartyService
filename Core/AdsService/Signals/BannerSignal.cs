@@ -99,4 +99,20 @@ namespace ThirdPartyService.Core.AdsService.Signals
             this.PlacementId = placementId;
         }
     }
+
+    // The banner came onto the screen or left it. Fired when the ad actually displays, not when a
+    // show is asked for, so a layout that makes room for the banner only moves when there is a banner
+    // to make room for. HeightPixels is the banner's on-screen height in pixels, or 0 when it is gone
+    // or the provider cannot tell.
+    public readonly struct OnBannerVisibilityChangedSignal
+    {
+        public readonly bool  Visible;
+        public readonly float HeightPixels;
+
+        public OnBannerVisibilityChangedSignal(bool visible, float heightPixels)
+        {
+            this.Visible      = visible;
+            this.HeightPixels = heightPixels;
+        }
+    }
 }

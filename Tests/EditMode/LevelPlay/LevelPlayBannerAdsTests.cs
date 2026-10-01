@@ -1,10 +1,12 @@
 namespace ThirdPartyService.Tests.EditMode.LevelPlay
 {
     #if LevelPlay
+    using System.Collections.Generic;
     using System.Linq;
     using NUnit.Framework;
     using ThirdPartyService.Core.AdsService.BannerAds;
     using ThirdPartyService.Core.AdsService.MRECAds;
+    using ThirdPartyService.Core.AdsService.Signals;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk;
 
@@ -152,6 +154,68 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             Assert.That(this.rig.Count(AdFormat.Banner, AdEventKind.LeftApplication), Is.EqualTo(1));
             Assert.That(this.rig.Count(AdFormat.Banner, AdEventKind.ShowFailed), Is.EqualTo(1));
             Assert.That(banner.IsShown(), Is.False);
+        }
+
+        // The game lifts its HUD only for a banner that is really on screen, so the signal waits for
+        // Displayed - not the show request, not the load - and says so once however often LevelPlay
+        // refreshes the ad.
+        [Test]
+        public void Visibility_IsAnnouncedOnDisplay_Once_WithTheBannersHeight()
+        {
+            var seen = new List<OnBannerVisibilityChangedSignal>();
+            this.rig.Signals.Subscribe<OnBannerVisibilityChangedSignal>(seen.Add);
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+
+            banner.ShowBanner();
+            var unit = this.rig.Sdk.Banners.Single();
+            unit.CompleteLoad();
+            Assert.That(seen, Is.Empty, "a loaded banner that has not displayed yet takes no room");
+
+            unit.Display();
+            unit.Display();
+
+            Assert.That(seen, Has.Count.EqualTo(1));
+            Assert.That(seen[0].Visible, Is.True);
+            Assert.That(seen[0].HeightPixels, Is.EqualTo(50f));
+        }
+
+        [Test]
+        public void Visibility_IsWithdrawnOnHide_AndOnDisplayFailure()
+        {
+            var seen = new List<bool>();
+            this.rig.Signals.Subscribe<OnBannerVisibilityChangedSignal>(signal => seen.Add(signal.Visible));
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+            banner.ShowBanner();
+            var unit = this.rig.Sdk.Banners.Single();
+            unit.CompleteLoad();
+            unit.Display();
+
+            banner.HideBanner();
+            banner.HideBanner();
+
+            Assert.That(seen, Is.EqualTo(new[] { true, false }));
+
+            banner.ShowBanner();
+            unit.Display();
+            unit.FailDisplay();
+
+            Assert.That(seen, Is.EqualTo(new[] { true, false, true, false }));
+        }
+
+        [Test]
+        public void Visibility_IsNeverAnnounced_WithoutFill()
+        {
+            var seen = new List<bool>();
+            this.rig.Signals.Subscribe<OnBannerVisibilityChangedSignal>(signal => seen.Add(signal.Visible));
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+
+            banner.ShowBanner();
+            this.rig.Sdk.Banners.Single().FailLoad();
+
+            Assert.That(seen, Is.Empty);
         }
 
         [Test]

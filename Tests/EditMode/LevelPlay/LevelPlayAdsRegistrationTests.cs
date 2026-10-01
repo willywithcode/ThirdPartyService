@@ -5,6 +5,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using System.Linq;
     using GameFoundation.Scripts.Addressable;
     using GameFoundation.Scripts.Blueprints.ScriptableObject.DI;
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using NUnit.Framework;
     using ThirdPartyService.Core.AdsService;
     using ThirdPartyService.Core.AdsService.MRECAds;
@@ -50,6 +51,8 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             var builder = new ContainerBuilder();
             builder.RegisterInstance<IAssetsManager>(assets);
             builder.RegisterInstance<IAdsService>(new NullAdsService());
+            // Every game registers GDK's SignalBus; the banner reports its visibility through it.
+            builder.RegisterInstance(new SignalBus());
             builder.RegisterSOBlueprint();
             builder.RegisterConsent();
             builder.Register<NullAnalyticsService>(Lifetime.Singleton).As<IAdRevenueService>();

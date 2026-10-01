@@ -120,15 +120,24 @@ namespace ThirdPartyService.Tests.EditMode.Consent
             }
         }
 
-        [Test]
-        public async Task EmptyAppId_DoesNotCallBridge()
+        // No AdMob App ID yet (the first release ships without one): the flow must finish at once,
+        // touch nothing of Google's, and leave Privacy options hidden. Null is a missing asset.
+        [TestCase("")]
+        [TestCase("   ")]
+        [TestCase(null)]
+        public async Task EmptyAppId_DoesNotCallBridge(string appId)
         {
             var bridge = new Bridge();
-            var service = new ConsentService(bridge, new AppIdProvider { AppId = "" });
+            var service = new ConsentService(bridge, new AppIdProvider { AppId = appId });
             await service.GatherConsentAsync().AsTask();
             Assert.That(service.IsGathered, Is.True);
             Assert.That(service.IsPrivacyOptionsRequired, Is.False);
+            Assert.That(service.HasCurrentConsent, Is.False);
             Assert.That(bridge.UpdateCalls, Is.Zero);
+            Assert.That(bridge.FormCalls, Is.Zero);
+
+            await service.ShowPrivacyOptionsAsync().AsTask();
+            Assert.That(bridge.PrivacyCalls, Is.Zero);
         }
 
         [Test]

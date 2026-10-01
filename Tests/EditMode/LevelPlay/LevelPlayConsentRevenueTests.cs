@@ -57,6 +57,39 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             setup.Dispose();
         }
 
+        // Any call into Google's UMP fails the test.
+        private sealed class ForbiddenBridge : IConsentBridge
+        {
+            public bool IsPrivacyOptionsRequired => throw new AssertionException("UMP was asked for privacy options.");
+            public void RequestConsentInfoUpdate(System.Action onSuccess, System.Action onFailure) => throw new AssertionException("UMP was called.");
+            public void LoadAndShowConsentFormIfRequired(System.Action onComplete) => throw new AssertionException("UMP was called.");
+            public void ShowPrivacyOptionsForm(System.Action onComplete) => throw new AssertionException("UMP was called.");
+        }
+
+        private sealed class NoAppId : IConsentAppIdProvider
+        {
+            public string AppId => "";
+        }
+
+        // The first release ships without an AdMob App ID: the real consent service must finish
+        // without touching UMP, and LevelPlay must still start, with no CCPA flag.
+        [Test]
+        public async Task WithoutAnAdMobAppId_LevelPlayStartsWithoutTouchingUmp()
+        {
+            var rig     = new AdsTestRig(initialized: false);
+            var consent = new ConsentService(new ForbiddenBridge(), new NoAppId());
+            var setup = new Setup(rig.Session, rig.Settings, rig.NewBanner(), rig.NewMrec(), rig.NewInterstitial(), rig.NewRewarded(),
+                consent, new Ccpa { Value = null }, rig.Sdk, new Analytics());
+
+            setup.Start();
+            await Task.Yield();
+
+            Assert.That(consent.IsGathered, Is.True);
+            Assert.That(rig.Sdk.PrivacyCalls, Is.EqualTo(new[] { "COPPA:False", "Init" }));
+            Assert.That(rig.Sdk.InitAppKeys, Is.EqualTo(new[] { "app-key" }));
+            setup.Dispose();
+        }
+
         [Test]
         public void ImpressionCallback_ForwardsEachTypedImpression()
         {
