@@ -1,6 +1,7 @@
 namespace ThirdPartyService.Tests.EditMode.LevelPlay
 {
     #if LevelPlay
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -228,6 +229,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
         public readonly StubLevelPlaySettings Settings  = new();
         public readonly AdEventLog            Log       = new();
         public readonly List<AdEvent>         Events    = new();
+        public readonly SignalBus             Signals   = new();
         public readonly LevelPlaySdkSession   Session;
 
         public AdsTestRig(bool initialized = true)
@@ -241,7 +243,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
 
         public LevelPlayInterstitialAds NewInterstitial() => new(this.Session, this.Sdk, this.Settings, this.Scheduler, this.Log);
         public LevelPlayRewardedAds     NewRewarded()     => new(this.Session, this.Sdk, this.Settings, this.Scheduler, this.Log);
-        public LevelPlayBannerAds       NewBanner()       => new(this.Session, this.Sdk, this.Settings, this.Scheduler, this.Log);
+        public LevelPlayBannerAds       NewBanner()       => new(this.Session, this.Sdk, this.Settings, this.Scheduler, this.Log, this.Signals);
         public LevelPlayMRECAds         NewMrec()         => new(this.Session, this.Sdk, this.Settings, this.Scheduler, this.Log);
 
         public int Count(AdFormat format, AdEventKind kind) => this.Events.Count(e => e.Format == format && e.Kind == kind);

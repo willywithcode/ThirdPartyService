@@ -1,15 +1,26 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
 {
     #if LevelPlay
+    using GameFoundation.Scripts.Patterns.SignalBus;
     using ThirdPartyService.Core.AdsService.BannerAds;
+    using ThirdPartyService.Core.AdsService.Signals;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk;
 
     public class LevelPlayBannerAds : LevelPlayBannerSlot, IBannerAdsService
     {
-        public LevelPlayBannerAds(LevelPlaySdkSession session, IAdsSdk sdk, ILevelPlaySettingsProvider settings, IAdsScheduler scheduler, AdEventLog log)
-            : base(BannerAdSize.Banner, session, sdk, settings, scheduler, log) { }
+        private readonly SignalBus signalBus;
+
+        public LevelPlayBannerAds(LevelPlaySdkSession session, IAdsSdk sdk, ILevelPlaySettingsProvider settings, IAdsScheduler scheduler, AdEventLog log, SignalBus signalBus)
+            : base(BannerAdSize.Banner, session, sdk, settings, scheduler, log)
+        {
+            this.signalBus = signalBus;
+        }
+
+        // Only the banner reports: the MREC shares the slot but is never laid out around.
+        protected override void OnVisibilityChanged(bool visible, float heightPixels) =>
+            this.signalBus?.Fire(new OnBannerVisibilityChangedSignal(visible, heightPixels));
 
         protected override AdFormat Format => AdFormat.Banner;
 

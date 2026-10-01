@@ -23,6 +23,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
         private bool           loaded;
         private bool           wantShown;
         private bool           visible;
+        private bool           announcedVisible;
         private BannerPosition requestedPosition = PreloadPosition;
 
         protected LevelPlayBannerSlot(BannerAdSize size, LevelPlaySdkSession session, IAdsSdk sdk, ILevelPlaySettingsProvider settings, IAdsScheduler scheduler, AdEventLog log)
@@ -40,6 +41,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
         public bool IsShown() => this.visible;
 
         protected float ShownHeightPixels => this.visible ? this.unit.HeightPixels : 0f;
+
+        // Told when the ad really comes onto the screen and when it leaves, once per change: LevelPlay
+        // can raise Displayed again on every refresh, and a layout that moves on each one would jitter.
+        protected virtual void OnVisibilityChanged(bool visible, float heightPixels) { }
+
+        private void AnnounceVisible(bool visible)
+        {
+            if (visible == this.announcedVisible) return;
+            this.announcedVisible = visible;
+            this.OnVisibilityChanged(visible, visible && this.unit != null ? this.unit.HeightPixels : 0f);
+        }
 
         protected void ShowAt(BannerPosition position)
         {
@@ -69,6 +81,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
         {
             this.wantShown = false;
             this.visible   = false;
+            this.AnnounceVisible(false);
             if (this.unit == null) return;
             this.unit.Hide();
             this.log.Record(this.Format, AdEventKind.Hidden);
@@ -120,11 +133,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
             if (this.wantShown && !this.visible) this.ShowLoaded();
         }
 
-        private void OnDisplayed() => this.log.Record(this.Format, AdEventKind.Shown);
+        private void OnDisplayed()
+        {
+            this.log.Record(this.Format, AdEventKind.Shown);
+            if (this.visible) this.AnnounceVisible(true);
+        }
 
         private void OnDisplayFailed(string error)
         {
             this.visible = false;
+            this.AnnounceVisible(false);
             this.log.Record(this.Format, AdEventKind.ShowFailed, error);
         }
 
@@ -136,6 +154,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
         protected override void DestroyUnit()
         {
             if (this.unit == null) return;
+            this.AnnounceVisible(false);
             this.loop.Dispose();
             this.unit.Loaded          -= this.OnLoaded;
             this.unit.Displayed       -= this.OnDisplayed;
