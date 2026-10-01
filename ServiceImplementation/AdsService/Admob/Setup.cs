@@ -1,8 +1,9 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
 {
     #if Admob
-    using GameFoundation.Scripts.Addressable;
+    using Cysharp.Threading.Tasks;
     using GoogleMobileAds.Api;
+    using ThirdPartyService.Core.ConsentService;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
@@ -12,7 +13,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
     using UnityEngine;
     using VContainer.Unity;
 
-    public class Setup : IInitializable
+    // Starts the Google Mobile Ads SDK and then the formats the blueprint turns on.
+    //
+    // IStartable, not IInitializable, for two reasons: it runs after the blueprint services'
+    // Initialize has loaded AdmobSetting, and it must not start the SDK until the consent step has
+    // finished - the same order LevelPlay's Setup follows, and what docs/product/ads.md requires of
+    // every ad SDK. IConsentService.GatherConsentAsync is idempotent, so both Setups awaiting it
+    // shows the player one form.
+    public class Setup : IStartable
     {
         private readonly AdmobAOAAds                  aoaAds;
         private readonly AdmobBannerAds               bannerAds;
@@ -20,6 +28,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
         private readonly AdmobRewardedAds             rewardedAds;
         private readonly AdmobNativeAds               nativeAds;
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
+        private readonly IConsentService              consent;
 
         public Setup(
             AdmobAOAAds                  aoaAds,
@@ -27,7 +36,8 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
             AdmobInterstitialsAds        interstitialsAds,
             AdmobRewardedAds             rewardedAds,
             AdmobNativeAds               nativeAds,
-            AdmobSettingBlueprintService admobSettingBlueprintService
+            AdmobSettingBlueprintService admobSettingBlueprintService,
+            IConsentService              consent
         )
         {
             this.aoaAds                       = aoaAds;
@@ -36,13 +46,18 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
             this.rewardedAds                  = rewardedAds;
             this.nativeAds                    = nativeAds;
             this.admobSettingBlueprintService = admobSettingBlueprintService;
+            this.consent                      = consent;
         }
 
-        public void Initialize()
+        public void Start() => this.StartAfterConsentAsync().Forget();
+
+        private async UniTaskVoid StartAfterConsentAsync()
         {
+            await this.consent.GatherConsentAsync();
+
             var admobSetting = this.admobSettingBlueprintService.GetBlueprint();
             MobileAds.SetiOSAppPauseOnBackground(true);
-            MobileAds.Initialize((InitializationStatus initstatus) =>
+            MobileAds.Initialize(initstatus =>
             {
                 if (initstatus == null)
                 {

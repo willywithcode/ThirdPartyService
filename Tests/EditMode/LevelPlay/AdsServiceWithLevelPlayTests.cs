@@ -18,9 +18,10 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using ThirdPartyService.ServiceImplementation.AdsService.LocalDatas;
     using AdsService = ThirdPartyService.ServiceImplementation.AdsService.AdsService;
 
-    // What the ThirdPartyService AdsService aggregator does with the LevelPlay wrappers next to the
-    // Dummies. Interstitial takes the first READY service, so an unready LevelPlay falls through to
-    // the Dummy. A LevelPlay close reaches the caller as onShowSuccess and a show failure as
+    // What the ThirdPartyService AdsService aggregator does with the LevelPlay wrappers next to a
+    // second provider - the Dummies stand in for one here. Both waterfall formats take the
+    // highest-priority READY service, so an unready LevelPlay falls through for interstitial AND for
+    // rewarded. A LevelPlay close reaches the caller as onShowSuccess and a show failure as
     // onShowFail, now that AdsService.ShowInterstitialAd hands its callbacks over in
     // ShowInterstitial(where, onAdClosed, onAdFailedToShow) order.
     public class AdsServiceWithLevelPlayTests
@@ -100,13 +101,29 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
         }
 
         [Test]
-        public void Rewarded_AlwaysGoesToLevelPlay_SoAnUnreadyAdCompletesFalseInsteadOfTheDummysTrue()
+        public void UnreadyLevelPlayRewarded_FallsThroughToTheOtherProvider()
         {
+            var unit    = this.rig.Sdk.Rewardeds.Single();
             var results = new List<bool>();
 
             this.adsService.ShowRewardedAd(results.Add, "test");
 
-            Assert.That(results, Is.EqualTo(new[] { false }));
+            Assert.That(unit.ShowPlacements, Is.Empty, "LevelPlay had no ad, so it was skipped");
+            // The stand-in provider is always ready and pays at once.
+            Assert.That(results, Is.EqualTo(new[] { true }));
+        }
+
+        [Test]
+        public void ReadyLevelPlayRewarded_IsChosenOverTheOtherProvider()
+        {
+            var unit    = this.rig.Sdk.Rewardeds.Single();
+            var results = new List<bool>();
+            unit.CompleteLoad();
+
+            this.adsService.ShowRewardedAd(results.Add, "test");
+
+            Assert.That(unit.ShowPlacements, Is.EqualTo(new[] { "test" }), "LevelPlay outranks the other provider when both are ready");
+            Assert.That(results, Is.Empty, "the attempt is still running: nothing is paid until LevelPlay rewards");
         }
 
         [Test]

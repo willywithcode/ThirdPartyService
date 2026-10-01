@@ -131,21 +131,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
         #endregion
         #region Rewarded Ads
 
-        public bool IsRewardedAdReady()
-        {
-            var rewarded = this.rewardedAdsServices
-                .AsValueEnumerable()
-                .OrderByDescending(r => r.GetPriority())
-                .FirstOrDefault();
-            return rewarded?.IsAdReady() ?? false;
-        }
+        // Ready when ANY registered service has an ad, so a starved top-priority network falls
+        // through to the next one instead of reporting "no ads" over a filled lower network.
+        // Deliberately ungated by IsRemovedAds: rewarded ads keep serving after Remove Ads.
+        public bool IsRewardedAdReady() => this.ReadyRewarded() is { };
 
+        // The whole attempt belongs to one service: the highest-priority one that is ready when the
+        // caller asks. A show that then fails completes false; it is not retried on another network.
         public void ShowRewardedAd(UnityAction<bool> onComplete, string where)
         {
-            var rewarded = this.rewardedAdsServices
-                .AsValueEnumerable()
-                .OrderByDescending(r => r.GetPriority())
-                .FirstOrDefault();
+            var rewarded = this.ReadyRewarded();
             if (rewarded is { })
             {
                 rewarded.ShowAd(onComplete, where);
@@ -153,6 +148,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
             }
             onComplete?.Invoke(false);
         }
+
+        private IRewardedAdsService ReadyRewarded() => this.rewardedAdsServices
+            .AsValueEnumerable()
+            .OrderByDescending(r => r.GetPriority())
+            .FirstOrDefault(r => r.IsAdReady());
 
         #endregion
         #region MREC Ads

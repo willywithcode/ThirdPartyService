@@ -23,9 +23,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
         {
             builder.RegisterConsent();
             builder.Register<AdsService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
-            // #if UNITY_EDITOR
+            // The Editor gets the Dummies and nothing else, so every ad in the Editor is a fake that
+            // is always ready. No mediation SDK serves an ad in the Editor anyway, and a registered
+            // real provider would outrank the Dummies and answer "not ready" forever.
+            //
+            // A build gets the real providers and no Dummy, so the waterfall can actually run out of
+            // ads: the AdsService aggregator picks the highest-priority provider that is READY, and
+            // an always-ready Dummy at the end of that list would make "no fill" unreachable.
+            #if UNITY_EDITOR
             builder.RegisterDummyAds();
-            // #else
+            #else
             #if MAX
             builder.RegisterAPPLOVINAds();
             #endif
@@ -38,7 +45,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             #if LevelPlay
             builder.RegisterLevelPlayAds();
             #endif
-            // #endif
+            #endif
         }
     }
 }
