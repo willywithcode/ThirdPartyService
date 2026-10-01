@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0050daebaf8e4ff496d2b8e18abfcb39, type: 3}
   m_Name: ConsentSettings
   m_EditorClassIdentifier:
-  androidAdMobAppId:
+  androidAdMobAppId: ca-app-pub-5858245873661772~7597283328
