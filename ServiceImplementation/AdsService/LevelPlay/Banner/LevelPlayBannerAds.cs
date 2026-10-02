@@ -8,9 +8,15 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk;
 
-    public class LevelPlayBannerAds : LevelPlayBannerSlot, IBannerAdsService
+    public class LevelPlayBannerAds : LevelPlayBannerSlot, IBannerAdsService, IBannerLoadState
     {
         private readonly SignalBus signalBus;
+
+        public event System.Action BannerLoadStateChanged;
+
+        public bool IsBannerLoaded() => this.IsLoaded;
+
+        protected override void OnLoadedChanged() => this.BannerLoadStateChanged?.Invoke();
 
         public LevelPlayBannerAds(LevelPlaySdkSession session, IAdsSdk sdk, ILevelPlaySettingsProvider settings, IAdsScheduler scheduler, AdEventLog log, SignalBus signalBus)
             : base(BannerAdSize.Banner, session, sdk, settings, scheduler, log)

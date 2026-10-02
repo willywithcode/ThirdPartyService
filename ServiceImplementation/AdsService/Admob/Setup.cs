@@ -7,6 +7,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.NativeAds;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds;
@@ -71,11 +72,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
                 // access UnityEngine objects after initialization,
                 // use MobileAdsEventExecutor.ExecuteInUpdate(). For more information, see:
                 // https://developers.google.com/admob/unity/global-settings#raise_ad_events_on_the_unity_main_thread
-                if (admobSetting.useAOA) this.aoaAds.Initialize();
-                if (admobSetting.useBanner) this.bannerAds.Initialize();
-                if (admobSetting.useInterstitial) this.interstitialsAds.Initialize();
-                if (admobSetting.useRewarded) this.rewardedAds.Initialize();
-                if (admobSetting.useNative) this.nativeAds.Initialize();
+                // The formats start back on the main thread: the banner creates its view and reads
+                // the screen width there.
+                AdmobMainThread.Run(() =>
+                {
+                    if (admobSetting.useAOA) this.aoaAds.Initialize();
+                    if (admobSetting.useBanner) this.bannerAds.Initialize();
+                    if (admobSetting.useInterstitial) this.interstitialsAds.Initialize();
+                    if (admobSetting.useRewarded) this.rewardedAds.Initialize();
+                    if (admobSetting.useNative) this.nativeAds.Initialize();
+                });
             });
         }
     }

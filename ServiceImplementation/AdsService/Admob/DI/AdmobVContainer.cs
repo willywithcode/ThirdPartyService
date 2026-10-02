@@ -11,7 +11,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.DI
 
     // Called by AdsVContainer.RegisterAds() for a build, never in the Editor. The wrappers join the
     // AdsService aggregator's per-format lists; AdmobSetting.priority* decides where they sit against
-    // the other providers, and the asset keeps them below LevelPlay. AdmobSettingBlueprintService is
+    // the other providers. AdmobSettingBlueprintService is
     // not registered here: GDK's RegisterSOBlueprint already registers every BaseSOBlueprintService in
     // the loaded assemblies, and a second registration makes the container build fail.
     public static class AdmobVContainer
