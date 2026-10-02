@@ -40,6 +40,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
 
         public bool IsShown() => this.visible;
 
+        protected bool IsLoaded => this.loaded;
+
+        // Told when the slot gains its first ad and when it loses it with the ad object.
+        protected virtual void OnLoadedChanged() { }
+
         protected float ShownHeightPixels => this.visible ? this.unit.HeightPixels : 0f;
 
         // Told when the ad really comes onto the screen and when it leaves, once per change: LevelPlay
@@ -129,7 +134,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
 
         private void OnLoaded()
         {
+            var first = !this.loaded;
             this.loaded = true;
+            if (first) this.OnLoadedChanged();
             if (this.wantShown && !this.visible) this.ShowLoaded();
         }
 
@@ -164,11 +171,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
             this.unit.Collapsed       -= this.OnCollapsed;
             this.unit.LeftApplication -= this.OnLeftApplication;
             this.unit.Dispose();
+            var wasLoaded = this.loaded;
             this.unit      = null;
             this.loop      = null;
             this.loaded    = false;
             this.wantShown = false;
             this.visible   = false;
+            if (wasLoaded) this.OnLoadedChanged();
         }
     }
     #endif

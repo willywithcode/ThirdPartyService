@@ -48,6 +48,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
             this.nativeAdsServices        = nativeAdsServices;
             this.rewardedAdsServices      = rewardedAdsServices;
             this.signalBus                = signalBus;
+
+            foreach (var banner in this.bannerAdsServices)
+                if (banner is IBannerLoadState state) state.BannerLoadStateChanged += this.RefreshBanner;
         }
 
         #endregion
@@ -64,28 +67,45 @@ namespace ThirdPartyService.ServiceImplementation.AdsService
 
         private IBannerAdsService currentBannerAdsService;
         private bool              isShowingBannerAd = false;
+
+        // Asks for a banner once; which network's banner is on screen then follows load state, see
+        // RefreshBanner.
         public void ShowBannerAd()
         {
             if (this.IsRemovedAds()) return;
-            var banner = this.bannerAdsServices
-                .AsValueEnumerable()
-                .OrderByDescending(b => b.GetPriority())
-                .FirstOrDefault();
-            if (banner is { })
-            {
-                banner.ShowBanner();
-                this.currentBannerAdsService = banner;
-                this.isShowingBannerAd       = true;
-            }
+            this.isShowingBannerAd = this.bannerAdsServices.AsValueEnumerable().Any();
+            this.RefreshBanner();
             this.signalBus.Fire<OnShowBannerSignal>(new("AdsService", ""));
         }
+
+        // Not gated by IsRemovedAds: RemoveAds() marks the purchase first and then hides through here.
         public void HideBannerAd()
         {
-            if (this.IsRemovedAds()) return;
             this.currentBannerAdsService?.HideBanner();
-            this.isShowingBannerAd = false;
+            this.currentBannerAdsService = null;
+            this.isShowingBannerAd       = false;
             this.signalBus.Fire<OnHideBannerSignal>(new("AdsService", ""));
         }
+
+        // While a banner is wanted, shows the highest-priority banner that has an ad, so a starved top
+        // network falls through and a later load on it takes the screen back. The banner it replaces is
+        // hidden first: AdsGate keeps one "banner on screen" flag, so the old banner's hidden report
+        // must come before the new one's visible report. With nothing loaded, nothing changes.
+        private void RefreshBanner()
+        {
+            if (!this.isShowingBannerAd || this.IsRemovedAds()) return;
+            var best = this.bannerAdsServices
+                .AsValueEnumerable()
+                .OrderByDescending(b => b.GetPriority())
+                .FirstOrDefault(IsBannerLoaded);
+            if (best is null || ReferenceEquals(best, this.currentBannerAdsService)) return;
+
+            this.currentBannerAdsService?.HideBanner();
+            this.currentBannerAdsService = best;
+            best.ShowBanner();
+        }
+
+        private static bool IsBannerLoaded(IBannerAdsService banner) => banner is not IBannerLoadState state || state.IsBannerLoaded();
         public float GetBannerAdHeight()
         {
             if (this.IsRemovedAds()) return 0f;

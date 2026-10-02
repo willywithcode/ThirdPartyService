@@ -4,6 +4,8 @@ namespace ThirdPartyService.Tests.EditMode.Admob
     using System.Collections.Generic;
     using GameFoundation.Scripts.Patterns.SignalBus;
     using NUnit.Framework;
+    using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds;
@@ -23,8 +25,10 @@ namespace ThirdPartyService.Tests.EditMode.Admob
     public class AdmobUnconfiguredFormatTests
     {
         private AdmobSetting          setting;
+        private SignalBus             signals;
         private AdmobInterstitialsAds interstitial;
         private AdmobRewardedAds      rewarded;
+        private AdmobBannerAds        banner;
 
         [SetUp]
         public void SetUp()
@@ -32,8 +36,10 @@ namespace ThirdPartyService.Tests.EditMode.Admob
             this.setting = ScriptableObject.CreateInstance<AdmobSetting>();
             var blueprints = new AdmobSettingBlueprintService(new SingleAssetsManager(nameof(AdmobSetting), this.setting));
             blueprints.Initialize();
+            this.signals      = new SignalBus();
             this.interstitial = new AdmobInterstitialsAds(blueprints, new SignalBus());
             this.rewarded     = new AdmobRewardedAds(blueprints, new SignalBus());
+            this.banner       = new AdmobBannerAds(blueprints, this.signals);
         }
 
         [TearDown]
@@ -81,13 +87,43 @@ namespace ThirdPartyService.Tests.EditMode.Admob
         }
 
         [Test]
+        public void UnconfiguredBanner_InitializesWithoutTouchingTheSdk_AndNeverReportsLoaded()
+        {
+            var changes = 0;
+            this.banner.BannerLoadStateChanged += () => changes++;
+
+            this.banner.Initialize();
+
+            Assert.That(this.banner.IsInitialized(), Is.False);
+            Assert.That(this.banner.IsBannerLoaded(), Is.False, "the aggregator must keep the other network's banner");
+            Assert.That(changes, Is.Zero);
+        }
+
+        [Test]
+        public void UnconfiguredBanner_ShowAndHide_DoNothing_AndTakeNoRoom()
+        {
+            var seen = new List<OnBannerVisibilityChangedSignal>();
+            this.signals.Subscribe<OnBannerVisibilityChangedSignal>(seen.Add);
+            this.banner.Initialize();
+
+            this.banner.ShowBanner();
+            Assert.That(this.banner.GetBannerHeight(), Is.Zero);
+            this.banner.HideBanner();
+
+            Assert.That(seen, Is.Empty, "the gameplay bar must not make room for a banner that is not there");
+            Assert.That(this.banner.IsShown(), Is.False);
+        }
+
+        [Test]
         public void Priorities_ComeFromTheBlueprint_SoTheyMoveWithoutABuild()
         {
             this.setting.priorityInterstitial = 5;
             this.setting.priorityRewarded     = 5;
+            this.setting.priorityBanner       = 5;
 
             Assert.That(this.interstitial.GetPriority(), Is.EqualTo(5));
             Assert.That(this.rewarded.GetPriority(), Is.EqualTo(5));
+            Assert.That(this.banner.GetPriority(), Is.EqualTo(5));
         }
     }
     #endif

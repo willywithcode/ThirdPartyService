@@ -218,6 +218,55 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             Assert.That(seen, Is.Empty);
         }
 
+        // The aggregator shows the highest-priority banner that has an ad, so the banner reports when it
+        // gains one. A refresh is not a change, and a failed refresh keeps the last ad on screen.
+        [Test]
+        public void LoadState_TurnsOnWithTheFirstLoad_AndIsReportedOnce()
+        {
+            var banner  = this.rig.NewBanner();
+            var changes = 0;
+            banner.BannerLoadStateChanged += () => changes++;
+            banner.Initialize();
+            var unit = this.rig.Sdk.Banners.Single();
+            Assert.That(banner.IsBannerLoaded(), Is.False);
+
+            unit.CompleteLoad();
+            unit.CompleteLoad();
+            unit.FailLoad();
+
+            Assert.That(banner.IsBannerLoaded(), Is.True);
+            Assert.That(changes, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void LoadState_IsNeverOn_WithoutFill()
+        {
+            var banner  = this.rig.NewBanner();
+            var changes = 0;
+            banner.BannerLoadStateChanged += () => changes++;
+            banner.Initialize();
+
+            this.rig.Sdk.Banners.Single().FailLoad();
+
+            Assert.That(banner.IsBannerLoaded(), Is.False);
+            Assert.That(changes, Is.Zero);
+        }
+
+        [Test]
+        public void LoadState_TurnsOffWhenTheAdIsDestroyed()
+        {
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+            this.rig.Sdk.Banners.Single().CompleteLoad();
+            var changes = 0;
+            banner.BannerLoadStateChanged += () => changes++;
+
+            banner.Destroy();
+
+            Assert.That(banner.IsBannerLoaded(), Is.False);
+            Assert.That(changes, Is.EqualTo(1));
+        }
+
         [Test]
         public void Mrec_UsesTheMediumRectangleSizeOnTheBannerUnit_WhenNoMrecUnitIsSet()
         {
