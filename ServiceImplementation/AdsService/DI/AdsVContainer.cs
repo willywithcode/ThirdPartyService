@@ -1,6 +1,7 @@
 namespace ThirdPartyService.ServiceImplementation.AdsService.DI
 {
     using ThirdPartyService.ServiceImplementation.AdsService.DummyAds.DI;
+    using ThirdPartyService.ServiceImplementation.AdsService.Fsn;
     using ThirdPartyService.ServiceImplementation.ConsentService.DI;
     using VContainer;
     #if MAX
@@ -44,6 +45,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             #endif
             #if LevelPlay
             builder.RegisterLevelPlayAds();
+            #endif
+            // FSN needs the Google Mobile Ads SDK and an AdMob app id in the Android build; a game
+            // that supplies both defines FSN. Without it full screen native placements never fill.
+            #if FSN && UNITY_ANDROID
+            builder.Register<FsnFullScreenNativeAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            #else
+            builder.Register<UnavailableFullScreenNativeAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             #endif
             #endif
         }

@@ -1,0 +1,41 @@
+// Full screen native (FSN) ads: an AdMob native ad shown full screen with a close countdown.
+// Source of truth: FsnForUnity~/FsnForUnity/fsnlib (Android Studio project, hidden from Unity by
+// the trailing "~"). src/ and res/ here are copies of fsnlib/src/main/{java,res}; copy them again
+// after changing the library.
+//
+// The Google Mobile Ads SDK is compileOnly, as in fsnlib: the game supplies play-services-ads
+// (the Google Mobile Ads Unity plugin or its own androidlib) and sets its AdMob app id in
+// ConsentSettings.androidAdMobAppId. The C# side is registered only under the define FSN.
+apply plugin: 'com.android.library'
+
+dependencies {
+    compileOnly 'com.google.android.gms:play-services-ads:25.4.0'
+    implementation 'androidx.core:core:1.9.0'
+}
+
+android {
+    namespace 'com.ads.fsnforunity.fsnlib'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 23
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+}
