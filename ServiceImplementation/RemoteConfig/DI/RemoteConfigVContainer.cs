@@ -10,6 +10,8 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.DI
         {
             #if FIREBASE_REMOTE_CONFIG
             builder.Register<FirebaseRemoteConfig>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            #else
+            builder.Register<DefaultValuesRemoteConfig>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             #endif
         }
     }
