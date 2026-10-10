@@ -18,6 +18,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DummyAds.DI
             builder.Register<DummyMRECAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<DummyRewardedAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<DummyNativeAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            builder.Register<DummyFullScreenNativeAds>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         }
     }
 }
