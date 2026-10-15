@@ -4,18 +4,21 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DummyIAP
     using System.Collections.Generic;
     using ThirdPartyService.Core.IAPService;
 
-    public class DummyIAPService : IIAPService
+    public class DummyIAPService : IIAPService, IIAPRestoreResultService
     {
+        private Dictionary<string, IAPModel> catalog = new();
+        private readonly HashSet<string> owned = new();
         public bool IsInitialized => true;
 
         public void InitIapServices(Dictionary<string, IAPModel> iapPack, string environment = "production")
         {
-            // Dummy initialization logic (if any)
+            this.catalog = iapPack ?? new Dictionary<string, IAPModel>();
         }
 
         public void BuyProductID(string productId, Action<string> onComplete = null, Action<string> onFailed = null)
         {
-            // Simulate a successful purchase
+            foreach (var product in this.catalog.Values)
+                if (product.Id == productId && product.ProductType == ProductType.NonConsumable) this.owned.Add(productId);
             onComplete?.Invoke(productId);
         }
 
@@ -27,14 +30,14 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DummyIAP
 
         public void RestorePurchases(Action onComplete)
         {
-            // Simulate restoring purchases
-            onComplete?.Invoke();
+            this.RestorePurchasesWithResult(_ => onComplete?.Invoke());
         }
+        public void RestorePurchasesWithResult(Action<IAPRestoreResult> onComplete)
+            => onComplete?.Invoke(new IAPRestoreResult(true, new List<string>(this.owned)));
 
         public bool IsProductOwned(string productId)
         {
-            // Simulate that no products are owned
-            return false;
+            return this.owned.Contains(productId);
         }
 
         public bool IsProductAvailable(string productId)

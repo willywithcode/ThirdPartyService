@@ -11,7 +11,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
     using UnityEngine.Purchasing.Security;
     using ProductType = ThirdPartyService.Core.IAPService.ProductType;
 
-    public class UnityIAPService : IIAPService, IDetailedStoreListener
+    public class UnityIAPService : IIAPService, IIAPRestoreResultService, IDetailedStoreListener
     {
         private Action<string>               onPurchaseComplete, onPurchaseFailed;
         private IStoreController             mStoreController;
@@ -124,67 +124,25 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
         }
 
         public void RestorePurchases(Action onComplete)
+            => this.RestorePurchasesWithResult(_ => onComplete?.Invoke());
+
+        public void RestorePurchasesWithResult(Action<IAPRestoreResult> onComplete)
         {
-            #if FAKE_RESTORE_PURCHASE
-            foreach (var iapPack in this.iapPacks)
-            {
-                // this.signalBus.Fire(new UnityIAPOnRestorePurchaseCompleteSignal(iapPack.Value.Id));
-            }
-
-            onComplete?.Invoke();
-
-            return;
-
-            #endif
-
-            // If Purchasing has not yet been set up ...
             if (!this.IsInitialized)
+            { onComplete?.Invoke(new IAPRestoreResult(false, null, "IAP is not initialized.")); return; }
+            void Complete(bool success, string error)
             {
-                // ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
-                Debug.LogWarning("[UnityIAPService] RestorePurchases called but IAP not initialized");
-                onComplete?.Invoke();
-                return;
+                var owned = new List<string>();
+                if (success) foreach (var pack in this.iapPacks.Values)
+                    if (pack.ProductType == ProductType.NonConsumable && this.IsProductOwned(pack.Id)) owned.Add(pack.Id);
+                onComplete?.Invoke(new IAPRestoreResult(success, owned, error));
             }
-
-            // If we are running on an Apple device ...
+            #if FAKE_RESTORE_PURCHASE
+            Complete(true, null); return;
+            #endif
             if (Application.platform is RuntimePlatform.IPhonePlayer or RuntimePlatform.OSXPlayer)
-            {
-                // this.signalBus.Fire<OnStartDoingIAPSignal>();
-
-                // ... begin restoring purchases
-
-                // Fetch the Apple store-specific subsystem.
-                var apple = this.mStoreExtensionProvider.GetExtension<IAppleExtensions>();
-
-                // Begin the asynchronous process of restoring purchases. Expect a confirmation response in
-                // the Action<bool> below, and ProcessPurchase if there are previously purchased products to restore.
-                apple.RestoreTransactions((result, _) =>
-                {
-                    // The first phase of restoration. If no more responses are received on ProcessPurchase then
-                    // no purchases are available to be restored.
-                    if (!result)
-                    {
-                        Debug.LogWarning("[UnityIAPService] Apple restore transactions failed");
-                        onComplete?.Invoke();
-                        return;
-                    }
-
-                    foreach (var iapPack in this.iapPacks)
-                    {
-                        if (!this.IsProductOwned(iapPack.Value.Id)) continue;
-                        Debug.Log($"[UnityIAPService] Restored product: {iapPack.Value.Id}");
-                    }
-
-                    onComplete?.Invoke();
-                });
-            }
-            // Otherwise ...
-            else
-            {
-                // On Android/Google Play, purchases are automatically restored when IAP initializes.
-                // Just invoke the callback immediately.
-                onComplete?.Invoke();
-            }
+                this.mStoreExtensionProvider.GetExtension<IAppleExtensions>().RestoreTransactions(Complete);
+            else Complete(true, null); // Legacy Google ownership is restored at initialization.
         }
 
         public bool IsProductOwned(string productId)

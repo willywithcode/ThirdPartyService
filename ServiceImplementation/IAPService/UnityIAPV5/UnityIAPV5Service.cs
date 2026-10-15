@@ -19,7 +19,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
     /// An in-session BuyProductID onComplete callback handles fulfillment when supplied;
     /// recovered purchases and calls without that callback use the pending-purchase signal.
     /// </summary>
-    public class UnityIAPV5Service : IIAPService, IDisposable
+    public class UnityIAPV5Service : IIAPService, IIAPRestoreResultService, IDisposable
     {
         private sealed class PurchaseRequest
         {
@@ -37,7 +37,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
         private readonly HashSet<string> confirmingOrders = new();
         private readonly HashSet<string> confirmedTransactions = new();
         private readonly SignalBus signalBus;
-        private readonly List<Action> restoreCallbacks = new();
+        private readonly List<Action<IAPRestoreResult>> restoreCallbacks = new();
         private PurchaseRequest                     purchaseRequest;
         private bool                                isConnected;
         private bool                                productsFetched;
@@ -222,16 +222,19 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
         }
 
         public void RestorePurchases(Action onComplete)
+            => this.RestorePurchasesWithResult(_ => onComplete?.Invoke());
+
+        public void RestorePurchasesWithResult(Action<IAPRestoreResult> onComplete)
         {
             #if FAKE_RESTORE_PURCHASE
-            onComplete?.Invoke();
+            onComplete?.Invoke(new IAPRestoreResult(true, new List<string>(this.ownedProductIds)));
             return;
             #endif
 
             if (!this.IsInitialized)
             {
                 Debug.LogWarning("[UnityIAPV5Service] RestorePurchases called but IAP not initialized.");
-                onComplete?.Invoke();
+                onComplete?.Invoke(new IAPRestoreResult(false, null, "IAP is not initialized."));
                 return;
             }
 
@@ -247,7 +250,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
                     if (!success)
                     {
                         Debug.LogWarning($"[UnityIAPV5Service] Apple restore transactions failed: {error}");
-                        this.FinishRestore();
+                        this.FinishRestore(false, error);
                         return;
                     }
 
@@ -411,7 +414,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
 
             this.purchasesFetched = true;
             this.initializing = false;
-            this.FinishRestore();
+            this.FinishRestore(true);
         }
 
         private void OnPurchasesFetchFailed(PurchasesFetchFailureDescription failure)
@@ -420,7 +423,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
 
             this.fetchingPurchases = false;
             this.initializing = false;
-            this.FinishRestore();
+            this.FinishRestore(false, failure.ToString());
         }
 
         private void OnStoreDisconnected(StoreConnectionFailureDescription description)
@@ -430,7 +433,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             this.purchasesFetched = false;
             this.fetchingPurchases = false;
             this.confirmingOrders.Clear();
-            this.FinishRestore();
+            this.FinishRestore(false, description.ToString());
             Debug.LogWarning($"[UnityIAPV5Service] Store disconnected: {description}");
             // One reconnect attempt; a failed attempt remains retryable via InitIapServices.
             if (!this.disposed && !this.connecting)
@@ -458,7 +461,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             {
                 this.fetchingPurchases = false;
                 this.initializing = false;
-                this.FinishRestore();
+                this.FinishRestore(false, exception.Message);
                 Debug.LogException(exception);
             }
         }
@@ -486,14 +489,15 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
             }
         }
 
-        private void FinishRestore()
+        private void FinishRestore(bool success, string error = null)
         {
             this.restoring = false;
             var callbacks = this.restoreCallbacks.ToArray();
             this.restoreCallbacks.Clear();
+            var result = new IAPRestoreResult(success, success ? new List<string>(this.ownedProductIds) : null, error);
             foreach (var callback in callbacks)
             {
-                try { callback(); }
+                try { callback(result); }
                 catch (Exception exception) { Debug.LogException(exception); }
             }
         }
@@ -502,6 +506,7 @@ namespace ThirdPartyService.ServiceImplementation.UnityIAP.IAPService
         {
             if (this.disposed) return;
             this.disposed = true;
+            this.FinishRestore(false, "IAP service was disposed.");
             if (this.storeController != null)
             {
                 this.storeController.OnStoreDisconnected    -= this.OnStoreDisconnected;
