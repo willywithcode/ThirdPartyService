@@ -340,6 +340,16 @@ public class FsnAd extends Application {
             headlineView.setText(headline);
             nativeAdView.setHeadlineView(headlineView);
 
+            TextView bodyView = findViewById(R.id.body);
+            if (bodyView != null) {
+                if (nativeAd.getBody() != null) {
+                    bodyView.setText(nativeAd.getBody());
+                    nativeAdView.setBodyView(bodyView);
+                } else {
+                    bodyView.setVisibility(View.GONE);
+                }
+            }
+
             callToActionView.setText(cta);
             nativeAdView.setCallToActionView(callToActionView);
 
