@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="fsn_close_btn_size">25dp</dimen>
+    <dimen name="fsn_close_btn_size">32dp</dimen>
     <dimen name="fsn_ad_choice_size">20dp</dimen>
     <dimen name="fsn_ad_media_video_max_height">300dp</dimen>
 </resources>
