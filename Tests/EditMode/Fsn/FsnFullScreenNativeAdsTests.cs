@@ -18,6 +18,7 @@ namespace ThirdPartyService.Tests.EditMode.Fsn
             public bool   IsLoading { get; set; }
             public int    LoadCount { get; private set; }
             public int    ShowCount { get; private set; }
+            public int    LastCloseAfterSeconds { get; private set; }
 
             public Action<string> PendingClose;
 
@@ -30,9 +31,10 @@ namespace ThirdPartyService.Tests.EditMode.Fsn
                 this.IsLoading = true;
             }
 
-            public void Show(Action<string> onCompleted)
+            public void Show(int closeAfterSeconds, Action<string> onCompleted)
             {
                 this.ShowCount++;
+                this.LastCloseAfterSeconds = closeAfterSeconds;
                 this.IsReady      = false;
                 this.PendingClose = onCompleted;
             }
@@ -86,6 +88,20 @@ namespace ThirdPartyService.Tests.EditMode.Fsn
 
             this.created["high"].PendingClose(string.Empty);
             Assert.AreEqual(true, result);
+        }
+
+        [Test]
+        public void Show_PassesTheCloseDelayToTheUnit_NegativeMeaningTheConfiguredOne()
+        {
+            this.ads.Load("intro");
+            this.created["high"].IsReady = true;
+            this.ads.Show("intro", 7, _ => { });
+            Assert.AreEqual(7, this.created["high"].LastCloseAfterSeconds);
+
+            this.created["high"].PendingClose(string.Empty);
+            this.created["high"].IsReady = true;
+            this.ads.Show("intro", _ => { });
+            Assert.AreEqual(-1, this.created["high"].LastCloseAfterSeconds);
         }
 
         [Test]

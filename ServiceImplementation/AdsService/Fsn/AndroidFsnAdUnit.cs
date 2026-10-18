@@ -31,11 +31,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
         private static bool mobileAdsInitialized;
 
         private readonly AndroidJavaObject ad;
+        private readonly int               configuredCloseAfterSeconds;
 
         public AndroidFsnAdUnit(string adUnitId, FsnSettings settings)
         {
             this.AdUnitId = adUnitId;
             InitializeMobileAds();
+            this.configuredCloseAfterSeconds = settings.closeAfterSeconds;
             this.ad = new AndroidJavaObject(FsnAdClass);
             this.ad.Call("Init", Debug.isDebugBuild ? TestNativeAdUnit : adUnitId, settings.closeAfterSeconds, settings.reloadAfterClose, settings.startMuted, settings.closeWhenAdClicked);
             this.ad.Call("SetFsnListener", new LoadListener(this));
@@ -50,8 +52,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
             this.ad.Call("LoadAd", activity);
         }
 
-        public void Show(Action<string> onCompleted)
+        public void Show(int closeAfterSeconds, Action<string> onCompleted)
         {
+            this.ad.Call("SetCountDownSec", closeAfterSeconds >= 0 ? closeAfterSeconds : this.configuredCloseAfterSeconds);
             using var activity = CurrentActivity();
             this.ad.Call("ShowAd", activity, new CompletedListener(onCompleted));
         }
@@ -113,7 +116,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
 
         public void Load() { }
 
-        public void Show(Action<string> onCompleted) => onCompleted?.Invoke("FSN ads need an Android device");
+        public void Show(int closeAfterSeconds, Action<string> onCompleted) => onCompleted?.Invoke("FSN ads need an Android device");
 #endif
     }
 }

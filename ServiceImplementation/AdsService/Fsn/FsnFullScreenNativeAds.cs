@@ -52,7 +52,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
 
         public bool IsReady(string placement) => this.FirstReady(placement) != null;
 
-        public void Show(string placement, UnityAction<bool> onClosed)
+        public void Show(string placement, UnityAction<bool> onClosed) => this.Show(placement, -1, onClosed);
+
+        public void Show(string placement, int closeAfterSeconds, UnityAction<bool> onClosed)
         {
             var unit = this.showing ? null : this.FirstReady(placement);
             if (unit == null)
@@ -65,7 +67,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
             this.showing        = true;
             this.shownPlacement = placement;
             this.signalBus.Fire<OnNativeShowSignal>(new(Platform, placement));
-            unit.Show(error =>
+            unit.Show(closeAfterSeconds, error =>
             {
                 this.showing = false;
                 var shown = string.IsNullOrEmpty(error);

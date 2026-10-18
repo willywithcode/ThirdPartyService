@@ -19,5 +19,12 @@ namespace ThirdPartyService.Core.AdsService.NativeAds
         /// thread once: true after a shown ad is closed, false when nothing could be shown.
         /// </summary>
         void Show(string placement, UnityAction<bool> onClosed);
+
+        /// <summary>
+        /// <see cref="Show(string, UnityAction{bool})"/> with the close button appearing after
+        /// <paramref name="closeAfterSeconds"/> for this show; a negative value keeps the configured
+        /// delay. Providers without a countdown ignore it.
+        /// </summary>
+        void Show(string placement, int closeAfterSeconds, UnityAction<bool> onClosed) => this.Show(placement, onClosed);
     }
 }

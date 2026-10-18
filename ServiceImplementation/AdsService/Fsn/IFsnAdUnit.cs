@@ -17,7 +17,11 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Fsn
 
         void Load();
 
-        /// <summary><paramref name="onCompleted"/> gets an empty string after the ad closed, the reason it was not shown otherwise.</summary>
-        void Show(Action<string> onCompleted);
+        /// <summary>
+        /// <paramref name="onCompleted"/> gets an empty string after the ad closed, the reason it was
+        /// not shown otherwise. The close button appears after <paramref name="closeAfterSeconds"/>,
+        /// or after <see cref="FsnSettings.closeAfterSeconds"/> when it is negative.
+        /// </summary>
+        void Show(int closeAfterSeconds, Action<string> onCompleted);
     }
 }

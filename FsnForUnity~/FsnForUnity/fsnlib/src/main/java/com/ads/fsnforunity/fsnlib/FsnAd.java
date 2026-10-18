@@ -65,6 +65,11 @@ public class FsnAd extends Application {
         this.autoDismissWhenAdClicked = autoDismissWhenAdClicked;
     }
 
+    /** Seconds before the close button appears, for the next shows. */
+    public void SetCountDownSec(int countDownSec) {
+        this.countDownSec = Math.max(0, countDownSec);
+    }
+
     public void SetFsnListener(OnFsnLoadListener onFsnLoadListener) {
         this.onFsnLoadListener = onFsnLoadListener;
     }
