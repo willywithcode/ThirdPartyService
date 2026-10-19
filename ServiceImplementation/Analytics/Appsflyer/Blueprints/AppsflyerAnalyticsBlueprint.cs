@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer.Blueprints
 {
-#if APPLYER_ANALYTICS
+#if APPSFLYER_ANALYTICS
     using GameFoundation.Scripts.Addressable;
     using GameFoundation.Scripts.Blueprints.ScriptableObject.Attributes;
     using GameFoundation.Scripts.Blueprints.ScriptableObject.Services;
