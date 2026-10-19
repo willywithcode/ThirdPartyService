@@ -1,6 +1,6 @@
 namespace ThirdPartyService.ServiceImplementation.Analytics.Appsflyer
 {
-    #if APPLYER_ANALYTICS
+    #if APPSFLYER_ANALYTICS
     using System.Collections.Generic;
     using AppsFlyerSDK;
     using ThirdPartyService.Core.Analytics;
