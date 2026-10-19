@@ -1,11 +1,14 @@
 # Android consent setup
 
-`Resources/ThirdPartyService/ConsentSettings.asset` holds the Android AdMob **App ID**
-(`ca-app-pub-…~…`). The ID is currently empty. Fill it after creating the AdMob app and
-publishing its GDPR and US state messages. The build processor writes
-`com.google.android.gms.ads.APPLICATION_ID` into the Unity library manifest only when this field
-is nonempty. At runtime, an empty field skips UMP and reports consent gathered with no
-privacy-options entry.
+The Android AdMob **App ID** (`ca-app-pub-…~…`) is declared by each game in its own repository,
+not in this library. See "AdMob app ID" in the ThirdPartyService README: the Google Mobile Ads
+plugin settings, or `Assets/Resources/ThirdPartyService/ConsentSettings.asset` in the game for
+games without that plugin. `Editor/ConsentManifestPostprocessor.cs` checks the declaration on every
+Android build (`AdMobAppIdSources`) and writes the ID into the manifest when the plugin does not.
+
+At runtime `ConsentAppIdProvider` reads `com.google.android.gms.ads.APPLICATION_ID` from the
+app's manifest. An empty value skips UMP and reports consent gathered with no privacy-options
+entry. Publish the AdMob app's GDPR and US state messages before relying on the forms.
 
 UMP is pinned to `com.google.android.ump:user-messaging-platform:4.0.0` by
 `Editor/UmpDependencies.xml`. Google's Android setup guide names this version:
