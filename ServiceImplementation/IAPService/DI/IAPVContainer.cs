@@ -16,6 +16,9 @@ namespace ThirdPartyService.ServiceImplementation.IAPService.DI
             builder.Register<UnityIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
             #elif UNITY_PURCHASING_V5
             builder.Register<UnityIAPV5Service>(Lifetime.Singleton).AsImplementedInterfaces();
+            #else
+            // No Unity IAP in this build: IIAPService still resolves, and nothing can be bought.
+            builder.Register<UnavailableIAPService>(Lifetime.Singleton).AsImplementedInterfaces();
             #endif
         }
     }

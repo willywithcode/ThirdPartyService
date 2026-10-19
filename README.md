@@ -1,5 +1,19 @@
 # ThirdPartyService
 
+## Scripting defines (what each game turns on)
+
+A provider is compiled, registered and put into the build only when the game defines its symbol
+(Player Settings > Other Settings > Scripting Define Symbols, per platform). The Editor always gets the Dummies.
+
+| Define | Turns on | Without it |
+|---|---|---|
+| `Admob`, `MAX`, `IronSource`, `LevelPlay` | that ad network's providers | not compiled or registered |
+| `FSN` (Android) | full screen natives (`FsnFullScreenNativeAds`) and the `FsnForUnity.androidlib` module | `UnavailableFullScreenNativeAds`; `FsnGradleStripper` takes the androidlib out of the Gradle project, so no FSN code, resources or `FsnActivity` ship |
+| `UMP` (Android) | the UMP consent flow (`ConsentService`, `AndroidUmpBridge`) and the UMP SDK, added to Gradle by `UmpGradlePostprocessor` unless another plugin already brings it | `DummyConsentService`, and no UMP SDK from this library. A game that declares an AdMob app ID without `UMP` gets a build warning: AdMob needs consent in the EEA and UK |
+| `FIREBASE_ANALYTICS`, `APPSFLYER_ANALYTICS` | those analytics providers | `NullAnalyticsService` when neither is set |
+| `FIREBASE_REMOTE_CONFIG` | Firebase Remote Config | `DefaultValuesRemoteConfig` |
+| `UNITY_PURCHASING` / `UNITY_PURCHASING_V5` (the latter set automatically from the IAP package version) | Unity IAP | `UnavailableIAPService` in builds: nothing can be bought. The Editor uses `DummyIAPService`, where every purchase succeeds |
+
 ## AdMob app ID (each game declares its own)
 
 The AdMob app ID (`ca-app-pub-...~...`) belongs to the game, never to this library, which ships no
@@ -56,7 +70,7 @@ An AdMob native ad shown full screen, closable after a countdown.
 - `FsnSettings`: an Addressable ScriptableObject at the address `FsnSettings` listing each
   placement's ad units, tried in order.
 
-A game that defines `FSN` must also:
+A game that defines `FSN` must also (without `FSN` the androidlib is stripped from the build):
 
 1. put `com.google.android.gms:play-services-ads` in the Android build (the library only
    compiles against it), with the Google Mobile Ads Unity plugin or an androidlib of its own;
