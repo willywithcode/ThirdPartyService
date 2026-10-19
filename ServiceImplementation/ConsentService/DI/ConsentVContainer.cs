@@ -5,9 +5,13 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService.DI
 
     public static class ConsentVContainer
     {
+        /// <summary>
+        /// The real UMP consent flow on Android builds of games that define UMP (which also puts the
+        /// UMP SDK in the build, see UmpGradleDependency); the Dummy everywhere else.
+        /// </summary>
         public static void RegisterConsent(this IContainerBuilder builder)
         {
-            #if UNITY_ANDROID && !UNITY_EDITOR
+            #if UNITY_ANDROID && !UNITY_EDITOR && UMP
             builder.Register<ConsentAppIdProvider>(Lifetime.Singleton).As<IConsentAppIdProvider>();
             builder.Register<AndroidUmpBridge>(Lifetime.Singleton).As<IConsentBridge>();
             builder.Register<AndroidGppCcpaConsentReader>(Lifetime.Singleton).As<ICcpaConsentReader>();

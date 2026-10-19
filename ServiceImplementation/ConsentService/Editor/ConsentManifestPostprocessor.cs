@@ -33,6 +33,13 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService.Editor
                 AdMobSdkInBuild(unityLibraryPath));
             if (resolution.Error != null) throw new BuildFailedException(resolution.Error);
             if (resolution.InjectIntoManifest) WriteAppId(unityLibraryPath, resolution.AppId);
+#if !UMP
+            if (resolution.AppId != null)
+            {
+                Debug.LogWarning("[ThirdPartyService] This game uses AdMob but does not define UMP, so its consent flow is the Dummy: no consent form is shown. "
+                    + "AdMob needs consent for users in the EEA and UK: add UMP to the Android scripting define symbols unless the game gathers consent another way.");
+            }
+#endif
         }
 
         /// <summary>

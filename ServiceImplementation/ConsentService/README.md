@@ -10,9 +10,12 @@ At runtime `ConsentAppIdProvider` reads `com.google.android.gms.ads.APPLICATION_
 app's manifest. An empty value skips UMP and reports consent gathered with no privacy-options
 entry. Publish the AdMob app's GDPR and US state messages before relying on the forms.
 
-UMP is pinned to `com.google.android.ump:user-messaging-platform:4.0.0` by
-`Editor/UmpDependencies.xml`. Google's Android setup guide names this version:
-https://developers.google.com/admob/android/privacy
+The consent flow is opt-in: a game defines `UMP` (Android scripting define) to get `ConsentService`
+and the UMP SDK; without it, `DummyConsentService` is registered and this library adds no SDK. The
+SDK is `com.google.android.ump:user-messaging-platform:4.0.0` (`UmpGradleDependency`), added to the
+generated Gradle project by `Editor/UmpGradlePostprocessor.cs` unless it is already there (the
+Google Mobile Ads plugin ships its own `GoogleUmpDependencies.xml`). Google's Android setup guide
+names this version: https://developers.google.com/admob/android/privacy
 
 LevelPlay 9.5.1 documents automatic UMP GDPR/TCF passthrough, but no automatic US state
 GPP handling. The Android GPP reader uses the IAB default SharedPreferences keys
