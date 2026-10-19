@@ -13,7 +13,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.IronSource.Rewarded
 
         public IronSourceRewardedAds(IAssetsManager assetsManager)
         {
-            this.adUnitId = assetsManager.LoadAsset<IronSourceSetting>("IronSourceRewardedAds").rewardedAdKey;
+            this.adUnitId = assetsManager.LoadAsset<IronSourceSetting>("IronSourceSetting").rewardedAdKey;
         }
 
         private LevelPlayRewardedAd rewardedAd;
