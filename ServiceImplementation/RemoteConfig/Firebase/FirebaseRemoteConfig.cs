@@ -69,6 +69,13 @@ namespace ThirdPartyService.ServiceImplementation.RemoteConfig.Firebase
             {
                 var configValue = this.remoteConfig.GetValue(key);
 
+                // A key neither fetched nor given a default comes back as Firebase's static value
+                // ("" / 0 / false), not as "missing": the caller's default has to win there.
+                if (configValue.Source == global::Firebase.RemoteConfig.ValueSource.StaticValue)
+                {
+                    return defaultValue;
+                }
+
                 if (typeof(T) == typeof(string))
                 {
                     return (T)(object)configValue.StringValue;
