@@ -12,9 +12,16 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
     // requested before the SDK is ready is remembered, position included, and applied once the ad
     // object exists: the AdsService aggregator picks this wrapper without a readiness check.
     // LevelPlay refreshes a loaded banner by itself, so retries only run until the first load succeeds.
+    // A first load that never answers replaces the ad object after LoadTimeoutSeconds, and a display
+    // failure gives up the ad: the slot reports it has none, so the aggregator can show another
+    // network's banner, and loads a new one.
     public abstract class LevelPlayBannerSlot : LevelPlayAdWrapper
     {
         public const BannerPosition PreloadPosition = BannerPosition.BottomCenter;
+
+        // Longer than the slowest answer seen on a device (23 s for a no-fill), so only a load that
+        // really went silent is cut short.
+        public const float LoadTimeoutSeconds = 60f;
 
         private readonly BannerAdSize size;
 
@@ -112,7 +119,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
             }
 
             this.unit                 =  this.sdk.CreateBanner(adUnitId, this.size, position);
-            this.loop                 =  new AdLoadLoop(this.unit, () => this.loaded, this.scheduler, this.log, this.Format);
+            this.loop                 =  new AdLoadLoop(this.unit, () => this.loaded, this.scheduler, this.log, this.Format, LoadTimeoutSeconds, this.OnLoadTimedOut);
             this.unit.Loaded          += this.OnLoaded;
             this.unit.Displayed       += this.OnDisplayed;
             this.unit.DisplayFailed   += this.OnDisplayFailed;
@@ -124,6 +131,18 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
         }
 
         protected override void LoadNow() => this.loop.Load();
+
+        // The silent object ignores further loads, so a new one takes its place, keeping the show
+        // request and the position.
+        private void OnLoadTimedOut()
+        {
+            var position  = this.unit.Position;
+            var wantShown = this.wantShown;
+            var current   = this.settings.Current;
+            this.DestroyUnit();
+            this.wantShown = wantShown;
+            this.Create(current, position);
+        }
 
         private void ShowLoaded()
         {
@@ -151,6 +170,10 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner
             this.visible = false;
             this.AnnounceVisible(false);
             this.log.Record(this.Format, AdEventKind.ShowFailed, error);
+            if (!this.loaded) return;
+            this.loaded = false;
+            this.OnLoadedChanged();
+            this.loop?.Load();
         }
 
         private void OnClicked()         => this.log.Record(this.Format, AdEventKind.Clicked);
