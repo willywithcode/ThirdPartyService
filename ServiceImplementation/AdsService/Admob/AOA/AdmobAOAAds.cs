@@ -7,23 +7,28 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
     using GoogleMobileAds.Api;
     using GoogleMobileAds.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
+    using ThirdPartyService.ServiceImplementation.AdsService.Admob.Common;
     using ThirdPartyService.Core.AdsService.AOA;
     using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.Core.Analytics;
     using UnityEngine;
 
     public class AdmobAOAAds : IAOAAdsService
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
         private readonly SignalBus                    signalBus;
+        private readonly IAdRevenueService            adRevenue;
         private readonly string                       AD_FLATFORM = "Admob";
 
         public AdmobAOAAds(
             AdmobSettingBlueprintService admobSettingBlueprintService,
-            SignalBus                    signalBus
+            SignalBus                    signalBus,
+            IAdRevenueService            adRevenue
         )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
             this.signalBus                    = signalBus;
+            this.adRevenue                    = adRevenue;
         }
 
         private readonly TimeSpan  TIMEOUT = TimeSpan.FromHours(4);
@@ -127,6 +132,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.AOA
                     adValue.Value,
                     adValue.CurrencyCode));
                 this.signalBus.Fire<OnAOAAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+                AdmobMainThread.Run(() => this.adRevenue.SendAdImpression(AdmobImpression.From(
+                    AdmobImpression.AppOpen, this.admobSettingBlueprintService.GetBlueprint().aoaAdUnitId,
+                    AdmobImpression.AdSource(ad.GetResponseInfo()), adValue.Value, adValue.CurrencyCode)));
             };
             // Raised when an impression is recorded for an ad.
             ad.OnAdImpressionRecorded += () =>

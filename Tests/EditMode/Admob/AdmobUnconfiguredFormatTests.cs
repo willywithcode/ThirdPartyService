@@ -9,6 +9,7 @@ namespace ThirdPartyService.Tests.EditMode.Admob
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.InterstitialsAds;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds;
+    using ThirdPartyService.ServiceImplementation.Analytics.Null;
     using ThirdPartyService.Tests.EditMode.AdsService;
     using UnityEngine;
     using Object = UnityEngine.Object;
@@ -37,9 +38,9 @@ namespace ThirdPartyService.Tests.EditMode.Admob
             var blueprints = new AdmobSettingBlueprintService(new SingleAssetsManager(nameof(AdmobSetting), this.setting));
             blueprints.Initialize();
             this.signals      = new SignalBus();
-            this.interstitial = new AdmobInterstitialsAds(blueprints, new SignalBus());
-            this.rewarded     = new AdmobRewardedAds(blueprints, new SignalBus());
-            this.banner       = new AdmobBannerAds(blueprints, this.signals);
+            this.interstitial = new AdmobInterstitialsAds(blueprints, new SignalBus(), new NullAnalyticsService());
+            this.rewarded     = new AdmobRewardedAds(blueprints, new SignalBus(), new NullAnalyticsService());
+            this.banner       = new AdmobBannerAds(blueprints, this.signals, new NullAnalyticsService());
         }
 
         [TearDown]

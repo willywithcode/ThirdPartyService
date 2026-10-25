@@ -99,11 +99,11 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             var setup = new Setup(rig.Session, rig.Settings, rig.NewBanner(), rig.NewMrec(), rig.NewInterstitial(), rig.NewRewarded(),
                 consent, new Ccpa(), rig.Sdk, analytics);
             setup.Start();
-            rig.Sdk.EmitImpression(new AdImpression("network", "rewarded", "unit", 0.12345d));
+            rig.Sdk.EmitImpression(new AdImpression("ironSource", "network", "rewarded", "unit", 0.12345d, "USD"));
             Assert.That(analytics.Impressions.Count, Is.EqualTo(1));
             Assert.That(analytics.Impressions[0].Revenue, Is.EqualTo(0.12345d));
             setup.Dispose();
-            rig.Sdk.EmitImpression(new AdImpression("other", "banner", "other unit", 0.1d));
+            rig.Sdk.EmitImpression(new AdImpression("ironSource", "other", "banner", "other unit", 0.1d, "USD"));
             Assert.That(analytics.Impressions.Count, Is.EqualTo(1));
         }
 
@@ -127,14 +127,14 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
         [Test]
         public void FirebaseMapping_KeepsDoubleAndUsd_AndOmitsUnknownValue()
         {
-            var mapped = AdImpressionFirebaseParameters.Map(new AdImpression("network", "rewarded", "unit", 0.12345d));
+            var mapped = AdImpressionFirebaseParameters.Map(new AdImpression("ironSource", "network", "rewarded", "unit", 0.12345d, "USD"));
             Assert.That(mapped["ad_platform"], Is.EqualTo("ironSource"));
             Assert.That(mapped["ad_source"], Is.EqualTo("network"));
             Assert.That(mapped["ad_format"], Is.EqualTo("rewarded"));
             Assert.That(mapped["ad_unit_name"], Is.EqualTo("unit"));
             Assert.That(mapped["currency"], Is.EqualTo("USD"));
             Assert.That(mapped["value"], Is.TypeOf<double>().And.EqualTo(0.12345d));
-            Assert.That(AdImpressionFirebaseParameters.Map(new AdImpression("network", "banner", "unit", null)).ContainsKey("value"), Is.False);
+            Assert.That(AdImpressionFirebaseParameters.Map(new AdImpression("ironSource", "network", "banner", "unit", null, "USD")).ContainsKey("value"), Is.False);
         }
     }
     #endif
