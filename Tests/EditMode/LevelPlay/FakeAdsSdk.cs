@@ -216,6 +216,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             bannerAdUnitId       = "banner-unit",
             interstitialAdUnitId = "interstitial-unit",
             rewardedAdUnitId     = "rewarded-unit",
+            mrecAdUnitId         = "mrec-unit",
         };
 
         public bool StartSdkInReleaseBuilds { get; set; } = LevelPlaySettings.DefaultStartSdkInReleaseBuilds;

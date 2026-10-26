@@ -9,6 +9,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Common;
     using ThirdPartyService.Core.AdsService.BannerAds;
     using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.Core.Analytics;
     using UnityEngine;
 
     // AdMob's adaptive bottom banner behind IBannerAdsService. The AdsService aggregator shows it only
@@ -21,14 +22,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
         private readonly SignalBus                    signalBus;
+        private readonly IAdRevenueService            adRevenue;
 
         public AdmobBannerAds(
             AdmobSettingBlueprintService admobSettingBlueprintService,
-            SignalBus                    signalBus
+            SignalBus                    signalBus,
+            IAdRevenueService            adRevenue
         )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
             this.signalBus                    = signalBus;
+            this.adRevenue                    = adRevenue;
         }
 
         private BannerView bannerView;
@@ -130,7 +134,12 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             });
 
             view.OnAdPaid += adValue => AdmobMainThread.Run(() =>
-                this.signalBus.Fire<OnBannerAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode)));
+            {
+                this.signalBus.Fire<OnBannerAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+                this.adRevenue.SendAdImpression(AdmobImpression.From(
+                    AdmobImpression.Banner, this.admobSettingBlueprintService.GetBlueprint().bannerAdUnitId,
+                    AdmobImpression.AdSource(view.GetResponseInfo()), adValue.Value, adValue.CurrencyCode));
+            });
 
             view.OnAdClicked += () => AdmobMainThread.Run(() =>
                 this.signalBus.Fire<OnBannerAdClickedEventSignal>(new(this.AD_FLATFORM, "")));

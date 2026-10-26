@@ -7,6 +7,7 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
     using ThirdPartyService.Core.AdsService.BannerAds;
     using ThirdPartyService.Core.AdsService.MRECAds;
     using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Banner;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common;
     using ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk;
 
@@ -113,8 +114,76 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
             this.rig.Scheduler.RunPending();
             unit.FailLoad();
 
-            Assert.That(this.rig.Scheduler.Scheduled.Select(e => e.Delay), Is.EqualTo(new[] { 2f, 4f }));
+            Assert.That(this.rig.Scheduler.Scheduled.Select(e => e.Delay).Where(d => d != LevelPlayBannerSlot.LoadTimeoutSeconds),
+                Is.EqualTo(new[] { 2f, 4f }));
             Assert.That(unit.LoadCalls, Is.EqualTo(2));
+        }
+
+        // On a device the banner's third load never answered, and the loop waits for an answer before
+        // it asks again, so the banner stayed empty for the session.
+        [Test]
+        public void SilentFirstLoad_IsReplacedAfterTheTimeout_KeepingTheShowRequest()
+        {
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+            banner.ShowBanner();
+            var silent = this.rig.Sdk.Banners.Single();
+
+            Assert.That(this.rig.Scheduler.Pending.Single().Delay, Is.EqualTo(LevelPlayBannerSlot.LoadTimeoutSeconds));
+            this.rig.Scheduler.RunPending();
+
+            Assert.That(silent.Disposed, Is.True);
+            var fresh = this.rig.Sdk.Banners.Last();
+            Assert.That(fresh, Is.Not.SameAs(silent));
+            Assert.That(fresh.Position, Is.EqualTo(BannerPosition.BottomCenter));
+            Assert.That(fresh.LoadCalls, Is.EqualTo(1));
+            Assert.That(this.rig.Count(AdFormat.Banner, AdEventKind.LoadTimedOut), Is.EqualTo(1));
+
+            fresh.CompleteLoad();
+
+            Assert.That(fresh.ShowCalls, Is.EqualTo(1));
+            Assert.That(banner.IsShown(), Is.True);
+        }
+
+        [Test]
+        public void AnsweredLoad_CancelsItsTimeout()
+        {
+            var banner = this.rig.NewBanner();
+            banner.Initialize();
+            var unit = this.rig.Sdk.Banners.Single();
+
+            unit.FailLoad();
+            Assert.That(this.rig.Scheduler.Pending.Select(e => e.Delay), Is.EqualTo(new[] { 2f }), "only the retry is left");
+            this.rig.Scheduler.RunPending();
+            unit.CompleteLoad();
+
+            Assert.That(this.rig.Scheduler.Pending, Is.Empty);
+            this.rig.Scheduler.RunIncludingCancelled();
+            Assert.That(this.rig.Sdk.Banners.Count, Is.EqualTo(1), "a timeout that fires late does not replace a loaded ad");
+        }
+
+        [Test]
+        public void DisplayFailure_GivesUpTheAd_ReportsIt_AndLoadsANewOne()
+        {
+            var banner  = this.rig.NewBanner();
+            banner.Initialize();
+            var unit = this.rig.Sdk.Banners.Single();
+            unit.CompleteLoad();
+            banner.ShowBanner();
+            unit.Display();
+            var changes = 0;
+            banner.BannerLoadStateChanged += () => changes++;
+
+            unit.FailDisplay();
+
+            Assert.That(banner.IsBannerLoaded(), Is.False);
+            Assert.That(changes, Is.EqualTo(1), "the aggregator hears it and can show another network's banner");
+            Assert.That(unit.LoadCalls, Is.EqualTo(2));
+
+            unit.CompleteLoad();
+
+            Assert.That(unit.ShowCalls, Is.EqualTo(2), "still wanted, so the new ad goes up");
+            Assert.That(banner.IsBannerLoaded(), Is.True);
         }
 
         [Test]
@@ -268,15 +337,14 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
         }
 
         [Test]
-        public void Mrec_UsesTheMediumRectangleSizeOnTheBannerUnit_WhenNoMrecUnitIsSet()
+        public void Mrec_LoadsNothing_WhenNoMrecUnitIsSet()
         {
+            this.rig.Settings.Current.mrecAdUnitId = "";
             var mrec = this.rig.NewMrec();
 
             mrec.Initialize();
 
-            var unit = this.rig.Sdk.Banners.Single();
-            Assert.That(unit.Size, Is.EqualTo(BannerAdSize.MediumRectangle));
-            Assert.That(unit.AdUnitId, Is.EqualTo("banner-unit"));
+            Assert.That(this.rig.Sdk.Banners, Is.Empty, "an MREC on the banner unit would compete with the banner for its fill");
         }
 
         [Test]
@@ -287,7 +355,9 @@ namespace ThirdPartyService.Tests.EditMode.LevelPlay
 
             mrec.Initialize();
 
-            Assert.That(this.rig.Sdk.Banners.Single().AdUnitId, Is.EqualTo("mrec-unit"));
+            var unit = this.rig.Sdk.Banners.Single();
+            Assert.That(unit.AdUnitId, Is.EqualTo("mrec-unit"));
+            Assert.That(unit.Size, Is.EqualTo(BannerAdSize.MediumRectangle));
         }
 
         [TestCase(MRECAdsPosition.TopLeft, BannerPosition.TopLeft)]

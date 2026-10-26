@@ -9,11 +9,11 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
         {
             var parameters = new Dictionary<string, object>
             {
-                ["ad_platform"] = "ironSource",
+                ["ad_platform"] = impression.AdPlatform ?? "",
                 ["ad_source"] = impression.AdNetwork ?? "",
                 ["ad_format"] = impression.AdFormat ?? "",
                 ["ad_unit_name"] = impression.AdUnitName ?? "",
-                ["currency"] = "USD",
+                ["currency"] = impression.Currency ?? "",
             };
             if (impression.Revenue.HasValue) parameters["value"] = impression.Revenue.Value;
             return parameters;

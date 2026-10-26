@@ -7,6 +7,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
     using GoogleMobileAds.Api;
     using ThirdPartyService.Core.AdsService.RewardedAds;
     using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Common;
     using UnityEngine;
@@ -26,14 +27,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
         private readonly SignalBus                    signalBus;
+        private readonly IAdRevenueService            adRevenue;
 
         public AdmobRewardedAds(
             AdmobSettingBlueprintService admobSettingBlueprintService,
-            SignalBus                    signalBus
+            SignalBus                    signalBus,
+            IAdRevenueService            adRevenue
         )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
             this.signalBus                    = signalBus;
+            this.adRevenue                    = adRevenue;
         }
 
         private sealed class Attempt
@@ -116,8 +120,13 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.RewardedAds
 
         private void RegisterEventHandlers(RewardedAd ad)
         {
-            ad.OnAdPaid += adValue => this.signalBus.Fire<OnRewardedAdRevenuePaidEventSignal>(
-                new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+            ad.OnAdPaid += adValue => AdmobMainThread.Run(() =>
+            {
+                this.signalBus.Fire<OnRewardedAdRevenuePaidEventSignal>(new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode));
+                this.adRevenue.SendAdImpression(AdmobImpression.From(
+                    AdmobImpression.Rewarded, this.admobSettingBlueprintService.GetBlueprint().rewardedAdUnitId,
+                    AdmobImpression.AdSource(ad.GetResponseInfo()), adValue.Value, adValue.CurrencyCode));
+            });
 
             ad.OnAdClicked += () => this.signalBus.Fire<OnRewardedAdClickedEventSignal>(new(this.AD_FLATFORM, ""));
 

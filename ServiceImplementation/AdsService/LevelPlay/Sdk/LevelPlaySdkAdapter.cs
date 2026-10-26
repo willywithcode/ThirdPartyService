@@ -31,7 +31,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Sdk
         private void OnImpression(LevelPlayImpressionData data)
         {
             if (data == null) return;
-            this.impressionDataReady?.Invoke(new AdImpression(data.AdNetwork, data.AdFormat, data.MediationAdUnitName, data.Revenue));
+            this.impressionDataReady?.Invoke(new AdImpression("ironSource", data.AdNetwork, data.AdFormat, data.MediationAdUnitName, data.Revenue, "USD"));
         }
 
         public void SetCOPPA(bool value) => LevelPlayPrivacySettings.SetCOPPA(value);

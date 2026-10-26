@@ -160,6 +160,23 @@ namespace ThirdPartyService.Tests.EditMode.AdsService
             Assert.That(service.GetBannerAdHeight(), Is.EqualTo(20f));
         }
 
+        // A banner whose display failed reports it has no ad any more, and the other network's
+        // loaded banner takes the screen instead of leaving it empty.
+        [Test]
+        public void TheBannerOnScreenLosesItsAd_TheOtherLoadedBannerTakesOver()
+        {
+            var admob     = new Banner("admob", 20, this.calls);
+            var levelPlay = new Banner("levelplay", 10, this.calls);
+            admob.SetLoaded(true);
+            levelPlay.SetLoaded(true);
+            var service = this.NewService(levelPlay, admob);
+            service.ShowBannerAd();
+
+            admob.SetLoaded(false);
+
+            Assert.That(this.calls, Is.EqualTo(new[] { "show admob", "hide admob", "show levelplay" }));
+        }
+
         [Test]
         public void LowerLoadsLater_TheTopBannerStays()
         {

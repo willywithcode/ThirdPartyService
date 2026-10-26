@@ -34,6 +34,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common
         Expanded,
         Collapsed,
         LeftApplication,
+        LoadTimedOut,
     }
 
     public readonly struct AdEvent
@@ -63,7 +64,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Common
         {
             var adEvent = new AdEvent(format, kind, detail);
             var line    = "[LevelPlay] " + adEvent;
-            if (kind is AdEventKind.InitFailed or AdEventKind.LoadFailed or AdEventKind.ShowFailed)
+            if (kind is AdEventKind.InitFailed or AdEventKind.LoadFailed or AdEventKind.LoadTimedOut or AdEventKind.ShowFailed)
                 Debug.LogWarning(line);
             else
                 Debug.Log(line);

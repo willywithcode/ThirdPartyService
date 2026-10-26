@@ -35,10 +35,12 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.LevelPlay.Blueprint
         public string interstitialAdUnitId;
         public string rewardedAdUnitId;
 
-        [Tooltip("Leave empty to request the MREC size on the banner ad unit.")]
+        // No fallback to the banner unit: an MREC on it requested alongside every banner load and
+        // could take the fill the banner needed. Empty means no MREC is loaded.
+        [Tooltip("Leave empty to load no MREC.")]
         public string mrecAdUnitId;
 
-        public string MrecAdUnitId => string.IsNullOrEmpty(this.mrecAdUnitId) ? this.bannerAdUnitId : this.mrecAdUnitId;
+        public string MrecAdUnitId => this.mrecAdUnitId;
     }
 
     // The game's LevelPlay dashboard values per platform, loaded from the Addressable asset at the

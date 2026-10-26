@@ -27,6 +27,24 @@ namespace ThirdPartyService.Tests.EditMode.Fsn
             Assert.AreEqual("dependencies {\r\n    implementation project(':unityLibrary:GoogleMobileAdsPlugin.androidlib')\r\n}\r\n", stripped);
         }
 
+        // What broke the 0.0.7 build: the template came out of git with CRLF and Unity joined its
+        // include lines with LF, so the old strip saw one line and took the other modules with FSN.
+        [Test]
+        public void Strip_RemovesOnlyTheModuleInclude_WhenUnityJoinsIncludesWithLfInACrlfTemplate()
+        {
+            var settings = "include ':launcher', ':unityLibrary'\r\n" +
+                           "include 'unityLibrary:GoogleMobileAdsPlugin.androidlib'\ninclude 'unityLibrary:FsnForUnity.androidlib'\ninclude 'unityLibrary:FirebaseApp.androidlib'\r\n" +
+                           "\r\ndependencyResolutionManagement {\r\n}\r\n";
+
+            var stripped = FsnGradleModule.Strip(settings);
+
+            Assert.AreEqual(
+                "include ':launcher', ':unityLibrary'\r\n" +
+                "include 'unityLibrary:GoogleMobileAdsPlugin.androidlib'\ninclude 'unityLibrary:FirebaseApp.androidlib'\r\n" +
+                "\r\ndependencyResolutionManagement {\r\n}\r\n",
+                stripped);
+        }
+
         [Test]
         public void Strip_LeavesAScriptWithoutTheModule_Unchanged()
         {

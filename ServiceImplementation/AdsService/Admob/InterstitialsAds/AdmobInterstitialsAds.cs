@@ -7,6 +7,7 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
     using GoogleMobileAds.Api;
     using ThirdPartyService.Core.AdsService.InterstitialsAds;
     using ThirdPartyService.Core.AdsService.Signals;
+    using ThirdPartyService.Core.Analytics;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Blueprints;
     using ThirdPartyService.ServiceImplementation.AdsService.Admob.Common;
     using UnityEngine;
@@ -21,14 +22,17 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
     {
         private readonly AdmobSettingBlueprintService admobSettingBlueprintService;
         private readonly SignalBus                    signalBus;
+        private readonly IAdRevenueService            adRevenue;
 
         public AdmobInterstitialsAds(
             AdmobSettingBlueprintService admobSettingBlueprintService,
-            SignalBus                    signalBus
+            SignalBus                    signalBus,
+            IAdRevenueService            adRevenue
         )
         {
             this.admobSettingBlueprintService = admobSettingBlueprintService;
             this.signalBus                    = signalBus;
+            this.adRevenue                    = adRevenue;
         }
 
         private InterstitialAd interstitialAd;
@@ -110,8 +114,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Interstitials
 
         private void RegisterEventHandlers(InterstitialAd ad)
         {
-            ad.OnAdPaid += adValue => this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(
-                new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode, this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId));
+            ad.OnAdPaid += adValue => AdmobMainThread.Run(() =>
+            {
+                var adUnitId = this.admobSettingBlueprintService.GetBlueprint().interstitialAdUnitId;
+                this.signalBus.Fire<OnInterstitialAdRevenuePaidEventSignal>(
+                    new(this.AD_FLATFORM, "", adValue.Value, adValue.CurrencyCode, adUnitId));
+                this.adRevenue.SendAdImpression(AdmobImpression.From(
+                    AdmobImpression.Interstitial, adUnitId, AdmobImpression.AdSource(ad.GetResponseInfo()), adValue.Value, adValue.CurrencyCode));
+            });
 
             ad.OnAdClicked += () => this.signalBus.Fire<OnInterstitialAdClickedEventSignal>(new(this.AD_FLATFORM, ""));
 
