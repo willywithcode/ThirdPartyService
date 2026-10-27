@@ -74,15 +74,29 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob
                 // https://developers.google.com/admob/unity/global-settings#raise_ad_events_on_the_unity_main_thread
                 // The formats start back on the main thread: the banner creates its view and reads
                 // the screen width there.
+                // Each format starts on its own, so one that throws leaves the others running.
                 AdmobMainThread.Run(() =>
                 {
-                    if (admobSetting.useAOA) this.aoaAds.Initialize();
-                    if (admobSetting.useBanner) this.bannerAds.Initialize();
-                    if (admobSetting.useInterstitial) this.interstitialsAds.Initialize();
-                    if (admobSetting.useRewarded) this.rewardedAds.Initialize();
-                    if (admobSetting.useNative) this.nativeAds.Initialize();
+                    if (admobSetting.useAOA) StartFormat("app open", this.aoaAds.Initialize);
+                    if (admobSetting.useBanner) StartFormat("banner", this.bannerAds.Initialize);
+                    if (admobSetting.useInterstitial) StartFormat("interstitial", this.interstitialsAds.Initialize);
+                    if (admobSetting.useRewarded) StartFormat("rewarded", this.rewardedAds.Initialize);
+                    if (admobSetting.useNative) StartFormat("native", this.nativeAds.Initialize);
                 });
             });
+        }
+
+        private static void StartFormat(string format, System.Action initialize)
+        {
+            try
+            {
+                initialize();
+            }
+            catch (System.Exception error)
+            {
+                Debug.LogException(error);
+                Debug.LogError($"Admob {format} failed to start; the other formats go on.");
+            }
         }
     }
     #endif
