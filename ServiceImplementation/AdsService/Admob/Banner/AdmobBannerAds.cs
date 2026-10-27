@@ -57,7 +57,9 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.Admob.Banner
             // aggregator keeps the other network's banner.
             if (string.IsNullOrEmpty(adUnitId)) return;
 
-            var adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+            // The safe width in dp, not AdSize.FullWidth: the GMA Next-Gen SDK rejects FullWidth's -1
+            // with "Invalid width for AdSize: -1", and the exception stopped every later format.
+            var adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(MobileAds.Utils.GetDeviceSafeWidth());
             var view         = new BannerView(adUnitId, adaptiveSize, AdPosition.Bottom);
             this.bannerView = view;
             view.Hide();
