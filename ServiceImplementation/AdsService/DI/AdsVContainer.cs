@@ -28,10 +28,14 @@ namespace ThirdPartyService.ServiceImplementation.AdsService.DI
             // is always ready. No mediation SDK serves an ad in the Editor anyway, and a registered
             // real provider would outrank the Dummies and answer "not ready" forever.
             //
-            // A build gets the real providers and no Dummy, so the waterfall can actually run out of
-            // ads: the AdsService aggregator picks the highest-priority provider that is READY, and
+            // WebGL (an internal QA/demo target) has no mediation SDK at all - the mobile ad wrappers
+            // are compiled out there - so it also gets the Dummies, which lets the rewarded, revive and
+            // free-coins flows be walked in a browser.
+            //
+            // A device build gets the real providers and no Dummy, so the waterfall can actually run out
+            // of ads: the AdsService aggregator picks the highest-priority provider that is READY, and
             // an always-ready Dummy at the end of that list would make "no fill" unreachable.
-            #if UNITY_EDITOR
+            #if UNITY_EDITOR || UNITY_WEBGL
             builder.RegisterDummyAds();
             #else
             #if MAX
