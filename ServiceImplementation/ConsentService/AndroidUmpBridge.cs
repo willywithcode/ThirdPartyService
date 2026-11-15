@@ -70,11 +70,29 @@ namespace ThirdPartyService.ServiceImplementation.ConsentService
                 this.consentInformation = ump.CallStatic<AndroidJavaObject>("getConsentInformation", activity);
                 using var builder = new AndroidJavaObject("com.google.android.ump.ConsentRequestParameters$Builder");
                 using var configuredBuilder = builder.Call<AndroidJavaObject>("setTagForUnderAgeOfConsent", false);
+                if (ConsentDebug.IsActive)
+                {
+                    using var debugSettings = BuildDebugSettings(activity);
+                    using var debugBuilder = builder.Call<AndroidJavaObject>("setConsentDebugSettings", debugSettings);
+                }
                 using var parameters = builder.Call<AndroidJavaObject>("build");
                 this.successProxy = new SuccessProxy(() => this.OnMain(onSuccess));
                 this.failureProxy = new FailureProxy(() => this.OnMain(onFailure));
                 this.consentInformation.Call("requestConsentInfoUpdate", activity, parameters, this.successProxy, this.failureProxy);
             }, onFailure);
+        }
+
+        // See ConsentDebug. UMP ignores the geography on any device not listed here.
+        private static AndroidJavaObject BuildDebugSettings(AndroidJavaObject activity)
+        {
+            using var builder = new AndroidJavaObject("com.google.android.ump.ConsentDebugSettings$Builder", activity);
+            using var withGeography = builder.Call<AndroidJavaObject>("setDebugGeography", (int)ConsentDebug.Geography);
+            foreach (var id in ConsentDebug.TestDeviceHashedIds)
+            {
+                using var withDevice = builder.Call<AndroidJavaObject>("addTestDeviceHashedId", id);
+            }
+            Debug.Log($"[Consent] Debug geography {ConsentDebug.Geography} for {ConsentDebug.TestDeviceHashedIds.Count} test device(s).");
+            return builder.Call<AndroidJavaObject>("build");
         }
 
         public void LoadAndShowConsentFormIfRequired(Action onComplete) => this.Show("loadAndShowConsentFormIfRequired", onComplete);
