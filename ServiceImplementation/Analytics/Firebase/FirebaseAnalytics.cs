@@ -8,7 +8,7 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
     using ThirdPartyService.Core.Analytics;
     using UnityEngine;
     using VContainer.Unity;
-    public class FirebaseAnalytics : IAnalyticsService, IAdRevenueService, IInitializable
+    public class FirebaseAnalytics : IAnalyticsService, IAdRevenueService, IUserPropertyService, IAnalyticsConsentService, IInitializable
     {
         // Resolving dependencies takes several frames, and events fired in the meantime are real:
         // anything reported at startup would otherwise be dropped every single run. They wait here
@@ -17,6 +17,14 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
 
         private readonly List<(string EventName, Dictionary<string, string> EventParams)> pendingEvents = new();
         private readonly List<AdImpression> pendingImpressions = new();
+
+        // A property only ever needs its latest value, so a name set twice before init is kept once
+        // and the map is bounded by the number of names rather than by MAX_PENDING_EVENTS.
+        private readonly Dictionary<string, string> pendingUserProperties = new();
+
+        // Only the latest consent matters, and it goes out before anything queued, so the events
+        // fired during startup are collected under it.
+        private AnalyticsConsent? pendingConsent;
 
         private bool initFirebase = false;
         private bool initFailed   = false;
@@ -39,6 +47,8 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
                         this.initFailed = true;
                         this.pendingEvents.Clear();
                         this.pendingImpressions.Clear();
+                        this.pendingUserProperties.Clear();
+                        this.pendingConsent = null;
                         Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
                     }
                 });
@@ -65,6 +75,43 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
                 return;
             }
             LogImpression(impression);
+        }
+
+        public void SetConsent(AnalyticsConsent consent)
+        {
+            if (!this.initFirebase)
+            {
+                if (!this.initFailed) this.pendingConsent = consent;
+                return;
+            }
+
+            ApplyConsent(consent);
+        }
+
+        private static void ApplyConsent(AnalyticsConsent consent)
+        {
+            static ConsentStatus Status(bool granted) => granted ? ConsentStatus.Granted : ConsentStatus.Denied;
+
+            global::Firebase.Analytics.FirebaseAnalytics.SetConsent(new Dictionary<ConsentType, ConsentStatus>
+            {
+                [ConsentType.AnalyticsStorage]  = Status(consent.AnalyticsStorage),
+                [ConsentType.AdStorage]         = Status(consent.AdStorage),
+                [ConsentType.AdUserData]        = Status(consent.AdUserData),
+                [ConsentType.AdPersonalization] = Status(consent.AdPersonalization),
+            });
+        }
+
+        // Properties are flushed before the queued events, so the events fired during startup are
+        // already labelled with them.
+        public void SetUserProperty(string name, string value)
+        {
+            if (!this.initFirebase)
+            {
+                if (!this.initFailed) this.pendingUserProperties[name] = value;
+                return;
+            }
+
+            global::Firebase.Analytics.FirebaseAnalytics.SetUserProperty(name, value);
         }
 
         public static Parameter[] ToFirebaseParameters(AdImpression impression)
@@ -96,6 +143,15 @@ namespace ThirdPartyService.ServiceImplementation.Analytics.Firebase
 
         private void FlushPendingEvents()
         {
+            if (this.pendingConsent is { } consent) ApplyConsent(consent);
+            this.pendingConsent = null;
+
+            foreach (var property in this.pendingUserProperties)
+            {
+                global::Firebase.Analytics.FirebaseAnalytics.SetUserProperty(property.Key, property.Value);
+            }
+
+            this.pendingUserProperties.Clear();
             foreach (var (eventName, eventParams) in this.pendingEvents)
             {
                 LogEvent(eventName, eventParams);
